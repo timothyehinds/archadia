@@ -1,0 +1,3 @@
+#include "Pi2Jamma/CommandLine/CommandLineHandlerConfigFile.hpp"
+
+CommandLineHandlerConfigFile CommandLineHandlerConfigFile::sSingleton;

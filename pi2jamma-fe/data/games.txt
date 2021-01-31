@@ -1,0 +1,19 @@
+{
+"GameList" :
+	[
+		{ "DisplayName" : "Dig Dug" },
+		{
+			"DisplayName" : "Pacman",
+			"SnapName" : "pacman.png"
+		},
+		{ "DisplayName" : "Dig-Dug" },
+		{ "DisplayName" : "Burger Time (Midway) V1 (Old Rom)" },
+		{ "DisplayName" : "Galaxian V1" },
+		{ "DisplayName" : "Galaxian V2" },
+		{ "DisplayName" : "Galaxian V3" },
+		{ "DisplayName" : "Galaxian V4" },
+		{ "DisplayName" : "Galaxian V5" },
+		{ "DisplayName" : "Galaxian V6" },
+		{ "DisplayName" : "Galaxian V7" }
+	]
+}

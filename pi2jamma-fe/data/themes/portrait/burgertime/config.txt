@@ -1,0 +1,32 @@
+{
+	"SnapsRect" : {
+		"X" : 110,
+		"Y" : 1,
+		"Width" : 100,
+		"Height" : 100
+	},
+
+	"TitleRect" : {
+		"X" : 67,
+		"Y" : 17,
+		"Width" : 104,	
+		"Height" : 15
+	},
+
+	"TitleAlignment" : "Center",
+	"TitleTextColor" : "#FFFFFF",
+
+	"MenuRect" : {
+		"X" : 19,
+		"Y" : 200,
+		"Width" : 198,
+		"Height" : 100
+	},
+
+	"MenuTextHighlightColor" : "#FFFFFF",
+	"MenuTextColor" : "#000000",
+	"MenuTextSize" : 16,
+ 	"MenuTextAlignment" : "Left",
+
+ 	"FontFilePath" : "vgafix.fon"
+}

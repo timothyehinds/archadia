@@ -1,0 +1,162 @@
+Configuring the pi for pi2jamma hardware:
+
+------------------------------------------------------------------------
+VIDEO
+------------------------------------------------------------------------
+
+in /boot/config.txt, add lines:
+
+disable_audio_dither=1
+dtparam=audio=on
+dtoverlay=vga666
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+hdmi_timings=320 1 16 30 34 240 1 2 3 22 0 0 0 60 0 6400000 1 #240p
+
+------------------------------------------------------------------------
+AUDIO
+------------------------------------------------------------------------
+
+From command line:
+
+amixer cset numid=3 1
+
+------------------------------------------------------------------------
+CONTROLLER (pikeyd165)
+------------------------------------------------------------------------
+
+https://github.com/arcadeforge/regamebox_pikeyd165
+
+dependencies:
+
+bcm2835 library (latest): http://www.airspayce.com/mikem/bcm2835/
+
+bcm library istallation:
+------------
+	./configure
+	make
+	sudo make check
+	sudo make install
+
+PKEYD165 INSTALLATION:
+
+link pikeyd.conf to /etc/pkeyd165.conf
+	sudo ln -s /home/pi/pi2jamma/drivers/regamebox_pikeyd165/src/pikeyd165.conf /etc/pikeyd165.conf
+
+edit script to point to location of pikeyd app:
+
+move pikeyd init.d.script dir to /etc/init.d/pikeyd165
+
+	sudo ln -s /home/pi/pi2jamma/drivers/regamebox_pikeyd165/init.d.script/pikeyd165 /etc/init.d/pikeyd165
+
+Tell the os to start the script on boot.
+
+	update-rc.d pikeyd165 defaults
+	update-rc.d pikeyd165 enable
+
+To turn of the key pikeyd165 daemon on boot#!/bin/sh
+### BEGIN INIT INFO
+# Provides: pikeyd165
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Should-Start:
+# Default-Start: 2 3 4 5
+# Default-Stop:
+# Short-Description: rpi GPIO keyboard controller
+# Description: Originates from regamebox
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+. /lib/init/vars.sh
+
+do_start () {
+	echo "Starting Pikeyd165 daemon from script"
+	/home/pi/pi2jamma/drivers/regamebox_pikeyd165/src/pikeyd165 -smi -ndb -d
+}
+
+case "$1" in
+  start|"")
+	do_start
+	;;
+  restart|reload|force-reload)
+	echo "Error: argument '$1' not supported" >&2
+	exit 3
+	;;
+  stop)
+	killall pikeyd165
+	;;
+  *)
+	echo "Usage: motd [start|stop|status]" >&2
+	exit 3
+	;;
+esac
+: :
+
+	update-rc.d pikeyd165 defaults
+	update-rc.d pikeyd165 enable
+	update-rc.d pikeyd165 disable
+
+------------------------------------------------------------------------
+INSTALLING RETROARCH
+------------------------------------------------------------------------
+
+UPDATE RASBIAN:
+
+	sudo apt update
+	sudo apt upgrade
+
+INSTALL DEPENDENCIES:
+
+	sudo apt install build-essential libasound2-dev libudev-dev
+
+INSTALL RETROARCH:
+GET LATEST HERE: https://github.com/libretro/RetroArch/releases
+(TODO: We should really be cloning the git repro)
+
+
+	curl -LO 'https://github.com/libretro/RetroArch/archive/v1.7.7.tar.gz'
+	tar -zxvf v1.7.7.tar.gz
+	cd RetroArch-1.7.7
+
+CONFIGURE:
+	CFLAGS='-mfpu=neon' ./configure --enable-alsa --enable-udev --enable-floathard --enable-neon --enable-dispmanx --disable-opengl1
+	
+BUILD:
+	make
+	sudo make install
+	
+RUN:
+	retroarch
+	
+
+------------------------------------------------------------------------
+RUNNING RETROARCH
+------------------------------------------------------------------------
+
+RUNNING RETROARCH FROM COMMANDLINE:
+
+retroarch -L /home/pi/.config/retroarch/cores/quicknes_libretro.so '/home/pi/roms/nes/Super Mario Bros (E).nes'
+
+------------------------------------------------------------------------
+FRONT-END
+------------------------------------------------------------------------
+
+INSTALL SDL: (graphics library)
+
+sudo apt-get install libsdl1.2-dev
+sudo apt-get install libsdl-image1.2-dev
+sudo apt-get install libsdl-ttf2.0-dev
+
+
+
+
+
+
+
+
+
+
+
+

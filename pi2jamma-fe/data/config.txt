@@ -1,0 +1,20 @@
+{
+	"Keys" :
+	{
+		"Up" : "UpArrow",
+		"Down" : "DownArrow",
+		"Left" : "LeftArrow",
+		"Right" : "RightArrow",
+		"Select" : "Space",
+		"Back" : "Escape"
+	},
+
+	"SaveConfigOnExit" : true,
+
+	"Ui" :
+	{
+		"ScreenOrientation" : "Portrait",
+		"LandscapeTheme" : "burgertime",
+		"PortraitTheme" : "burgertime"
+	}
+}
