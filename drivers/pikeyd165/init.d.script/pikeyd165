@@ -1,0 +1,37 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: pikeyd165
+# Required-Start: $local_fs
+# Required-Stop: $local_fs
+# Should-Start:
+# Default-Start: 2 3 4 5
+# Default-Stop:
+# Short-Description: rpi GPIO keyboard controller
+# Description: Originates from regamebox
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+. /lib/init/vars.sh
+
+do_start () {
+	echo "Starting Pikeyd165 daemon from script"
+	/home/pi/pi2jamma/drivers/regamebox_pikeyd165/src/pikeyd165 -smi -ndb -d
+}
+
+case "$1" in
+  start|"")
+	do_start
+	;;
+  restart|reload|force-reload)
+	echo "Error: argument '$1' not supported" >&2
+	exit 3
+	;;
+  stop)
+	killall pikeyd165
+	;;
+  *)
+	echo "Usage: motd [start|stop|status]" >&2
+	exit 3
+	;;
+esac
+:
