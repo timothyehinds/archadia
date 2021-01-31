@@ -13,7 +13,7 @@
 #include "ui/Point.hpp"
 
 Pi2JammaApplication::Pi2JammaApplication()
-	: mDataDir("/home/x/arcade/pi2jamma-fe/data")
+	: mDataDir("./data")
 {
 }
 

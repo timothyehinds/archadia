@@ -1,4 +1,4 @@
- TARGET_EXEC ?= pi2jamma
+TARGET_EXEC ?= pi2jamma
 
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src

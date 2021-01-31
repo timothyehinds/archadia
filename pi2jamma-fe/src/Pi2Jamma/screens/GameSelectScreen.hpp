@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/BitmapFont.hpp"
 #include "ui/elements/Label.hpp"
 #include "ui/elements/Image.hpp"
 #include "ui/elements/TextList.hpp"
@@ -35,7 +36,8 @@ private:
 
 	GamesListModel mGamesListModel;
 
-	ref<ui::Font> mrefFont;
+	ref<ui::BitmapFont> mrefSelectedFont;
+	ref<ui::BitmapFont> mrefUnselectedFont;
 
 	ref<ui::Image> mrefBackgroundImage;
 	ref<ui::Label> mrefTitle;

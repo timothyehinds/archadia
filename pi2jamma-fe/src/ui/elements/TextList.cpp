@@ -11,7 +11,8 @@ TextList::TextList(
 	TextListModel& listModel,
 	Element* pParent,
 	const Rect& rect,
-	ref<Font> refFont,
+	ref<BitmapFont> refSelectedBitmapFont,
+	ref<BitmapFont> refUnselectedBitmapFont,
 	const Color& unselectedColor,
 	const Color& selectedColor,
 	UnitType lineHeight,
@@ -19,7 +20,8 @@ TextList::TextList(
 	VerticalAlignment verticalAlignment)
 	: Element(pParent, rect)
 	, mListModel(listModel)
-	, mrefFont(std::move(refFont))
+	, mrefUnselectedFont(std::move(refUnselectedBitmapFont))
+	, mrefSelectedFont(std::move(refSelectedBitmapFont))
 	, mUnselectedColor(unselectedColor)
 	, mSelectedColor(selectedColor)
 	, mLineHeight(lineHeight)
@@ -27,18 +29,6 @@ TextList::TextList(
 	, mVerticalAlignment(verticalAlignment)
 {
 	auto numItems = mListModel.getNumItems();
-
-	mLabels.reserve(numItems);
-
-	for(size_t i = 0; i < numItems; i++)
-	{
-		ref<Surface> refSurface;
-
-		mLabels.emplace_back(
-			createSurface(
-				mUnselectedColor,
-				mListModel.getItem(i)));
-	}
 
 	if(numItems > 0 ) {
 		setSelection(0);
@@ -54,13 +44,6 @@ void TextList::setSelection(int itemIndex)
 	}
 
 	mSelectedItem = itemIndex;
-
-	mrefSelectedSurface =
-		createSurface(
-			mSelectedColor,
-			mListModel.getItem(mSelectedItem));
-
-	mListModel.onHighlighted(mSelectedItem);
 }
 
 void TextList::input(InputEvent& inputEvent)
@@ -104,25 +87,6 @@ void TextList::select()
 	mListModel.onSelect(mSelectedItem);
 }
 
-ref<Surface> TextList::createSurface(
-	const Color& color,
-	CStr text)
-{
-	ref<Surface> refSurface;
-
-	Result r =
-		Application::get().renderText(
-			refSurface,
-			mrefFont,
-			color,
-			text.c_str());
-
-	r.ignore();
-
-	return refSurface;
-}
-
-
 void TextList::render(RenderContext& renderContext)
 {
 	UnitType centerY = getRect().getYCenter();
@@ -131,7 +95,7 @@ void TextList::render(RenderContext& renderContext)
 	UnitType y = centerY - (mLineHeight / 2);
 	y -= ((mNumItemsToDisplay / 2) * mLineHeight);
 
-	int numItems = mLabels.size();
+	int numItems = mListModel.getNumItems();
 
 	int firstItemToDisplay = mSelectedItem - (mNumItemsToDisplay / 2);
 	int lastItemToDisplay = firstItemToDisplay + mNumItemsToDisplay;
@@ -149,16 +113,22 @@ void TextList::render(RenderContext& renderContext)
 			break;
 		}
 
-		auto refSurface = mLabels[i];
-
-		if(i == mSelectedItem) {
-			refSurface = mrefSelectedSurface;
-		}
-
 		Rect targetRect(
 			position,
 			Size(getWidth(), mLineHeight));
+		
+		ref<ui::BitmapFont> refFont =
+			(i == mSelectedItem)
+				? mrefSelectedFont
+				: mrefUnselectedFont;
 
+		refFont->render(
+			renderContext,
+			mListModel.getItem(i),
+			targetRect);
+
+
+		#if 0
 		auto fitResult =
 			fitRect(
 				Rect(
@@ -175,6 +145,7 @@ void TextList::render(RenderContext& renderContext)
 			refSurface,
 			fitResult.getTargetRect(),
 			fitResult.getSourceRect());
+		#endif
 	}
 }
 

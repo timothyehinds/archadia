@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/BitmapFont.hpp"
 #include "ui/Color.hpp"
 #include "ui/Font.hpp"
 #include "ui/Surface.hpp"
@@ -22,7 +23,8 @@ public:
 		TextListModel& listModel,
 		Element* pParent,
 		const Rect& rect,
-		ref<Font> refFont,
+		ref<BitmapFont> refSelectedBitmapFont,
+		ref<BitmapFont> refUnselectedBitmapFont,
 		const Color& unselectedColor,
 		const Color& selectedColor,
 		UnitType lineHeight,		
@@ -43,19 +45,14 @@ protected:
 
 private:
 
-	ref<Surface> createSurface(
-		const Color& color,
-		CStr text);
-
 	TextListModel& mListModel;
-	ref<Font> mrefFont;
+	ref<BitmapFont> mrefUnselectedFont;
+	ref<BitmapFont> mrefSelectedFont;
 	Color mUnselectedColor;
 	Color mSelectedColor;
 	UnitType mLineHeight;
 	HorizontalAlignment mHorizontalAlignment;
 	VerticalAlignment mVerticalAlignment;
-
-	std::vector<ref<Surface>> mLabels;
 
 	ref<Surface> mrefSelectedSurface;
 

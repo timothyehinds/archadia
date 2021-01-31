@@ -39,18 +39,31 @@ GameSelectScreen::GameSelectScreen(
 			mTheme.getSnapsRect(),
 			gEmptyString);
 
+	ref<ui::Font> refFont;
+
 	result =
 		application.loadFont(
-			mrefFont,
+			refFont,
 			mTheme.getMenuTextSize(),
 			joinPath(fullThemeDir, mTheme.getFontFilePath()));
+	
 	result.catastrophic();
 
+	mrefSelectedFont =
+		ui::BitmapFont::fromFont(
+			refFont,
+			mTheme.getMenuTextHighlightColor());
+
+	mrefUnselectedFont =
+		ui::BitmapFont::fromFont(
+			refFont,
+			mTheme.getMenuTextColor());
+	
 	mrefTitle =
 		make_ref<ui::Label>(
 			this,
 			mTheme.getTitleRect(),
-			mrefFont,
+			refFont,
 			mTheme.getTitleTextColor(),
 			"Title",
 			mTheme.getTitleAlignment());
@@ -60,7 +73,8 @@ GameSelectScreen::GameSelectScreen(
 			mGamesListModel,
 			this,
 			mTheme.getMenuRect(),
-			mrefFont,
+			mrefSelectedFont,
+			mrefUnselectedFont,
 			mTheme.getMenuTextColor(),
 			mTheme.getMenuTextHighlightColor(),
 			mTheme.getMenuTextSize());

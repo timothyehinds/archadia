@@ -88,7 +88,7 @@ Result Application::renderLoop()
 		RenderContext renderContext(*muptSdlRenderer);
 		render(renderContext);
 		SDL_RenderPresent(muptSdlRenderer.get());
-		SDL_Delay(16);
+		SDL_Delay(60);
 	}
 
 	return Result::makeSuccess();
