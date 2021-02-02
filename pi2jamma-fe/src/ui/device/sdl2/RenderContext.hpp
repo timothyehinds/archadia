@@ -5,9 +5,7 @@
 #include "ui/device/sdl2/Surface.hpp"
 #include "ui/device/sdl2/Rect.hpp"
 
-namespace ui {
-namespace device {
-namespace sdl2 {
+namespace ui::device::sdl2 {
 
 class Application;
 
@@ -24,4 +22,4 @@ class RenderContext
 		SDL_Renderer& mSdl2Renderer;
 };
 
-}}}
+}

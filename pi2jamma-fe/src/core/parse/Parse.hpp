@@ -112,7 +112,7 @@ OmBool OmParseSkipMatchingChars(
 
     OmBool skippedOne = OmFalse;
     
-    OmLoopInf
+    while(true)
     {
         if ( ! pParser->Peek( & c ) )
         {
@@ -234,7 +234,7 @@ inline void OmParseSplit(
 {
     typename PARSER_T::WorkAreaType* pWorkArea = pParser->ClearWorkArea();
     
-    OmLoopInf
+    while(true)
     {
         typename PARSER_T::CharType c;
         
@@ -266,7 +266,7 @@ inline void OmParseToDelimiterOrEof(
     typename PARSER_T::CharType delimiter,
     OmVector< typename PARSER_T::CharType >* pVector )
 {
-    OmLoopInf
+    while(true)
     {
         typename PARSER_T::CharType c;
         
@@ -376,7 +376,7 @@ inline OmBool OmParseMatch( PARSER_TYPE* pParser, Arg< OmString >::Type token )
     
     PARSER_TYPE parser( *pParser );
     
-    OmLoopI( tokenLength )
+    for(size_t i{0}; i < tokenLength; ++i)
     {
         typename PARSER_TYPE::CharType c;
         

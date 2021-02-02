@@ -9,7 +9,7 @@ const OmChar* OM_EMPTY_C_STRING = "";
 static void ToBinaryCString( OmUInt8 b, char buf[ 9 ] )
 {
 
-    OmLoopI( 8 )
+    for (size_t i{0}; i < 8; ++i)
     {
         buf[ ( 7 - i ) ] = ( b & ( 1 << i ) ) == 0 ? '0' : '1';
     }

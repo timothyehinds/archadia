@@ -1,6 +1,6 @@
 #include "ui/device/sdl2/Application.hpp"
 
-namespace ui { namespace device { namespace sdl2 {
+namespace ui::device::sdl2 {
 
 Application* Application::spSingleton = nullptr;
 
@@ -48,8 +48,8 @@ Result Application::run(int argc, const char* argv[])
 			"My Window",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			240,
 			320,
+			240,
 			SDL_WINDOW_SHOWN));
 
 	if(!muptSdlWindow) {
@@ -57,13 +57,34 @@ Result Application::run(int argc, const char* argv[])
 	}
 
 	muptSdlRenderer.reset(
-			SDL_CreateRenderer(
-				muptSdlWindow.get(),
-				-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
+		SDL_CreateRenderer(
+			muptSdlWindow.get(),
+			-1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
 
-	if(!muptSdlRenderer) {
+	if(!muptSdlRenderer)
+	{
 		return Result::makeFailureWithString(SDL_GetError());
 	}
+	
+	m_uptUnRotatedTexture.reset(
+		SDL_CreateTexture(
+			muptSdlRenderer.get(),
+			SDL_PIXELFORMAT_RGBA8888,
+			SDL_TEXTUREACCESS_TARGET,
+			240,
+			320));
+	
+	ASSERT(m_uptUnRotatedTexture);
+
+	m_uptRotatedTexture.reset(
+		SDL_CreateTexture(
+			muptSdlRenderer.get(),
+			SDL_PIXELFORMAT_RGBA8888,
+			SDL_TEXTUREACCESS_TARGET,
+			320,
+			240));	
+
+	ASSERT(m_uptRotatedTexture);
 
 	Result result = initialize(argc, argv);
 	if (result.peekFailed()) {
@@ -84,9 +105,34 @@ Result Application::renderLoop()
 			dispatchEvent(sdlEvent);
 		}
 
+
+		int r = SDL_SetRenderTarget(muptSdlRenderer.get(), m_uptUnRotatedTexture.get());
+		ASSERT(0 == r);
+
 		SDL_RenderClear(muptSdlRenderer.get());
+		ASSERT(0 == r);
+		
 		RenderContext renderContext(*muptSdlRenderer);
 		render(renderContext);
+
+		r = SDL_SetRenderTarget(muptSdlRenderer.get(), m_uptRotatedTexture.get());
+		ASSERT(0 == r);
+
+		SDL_RenderClear(muptSdlRenderer.get());
+		ASSERT(0 == r);
+
+		SDL_Rect target {0, 0, 240, 320};
+		SDL_Point center{120,120};		
+
+		r = SDL_RenderCopyEx(muptSdlRenderer.get(), m_uptUnRotatedTexture.get(), nullptr, &target, 270.0, &center, SDL_FLIP_NONE);
+		ASSERT(0 == r);
+
+		r = SDL_SetRenderTarget(muptSdlRenderer.get(), nullptr);
+		ASSERT(0 == r);
+
+		r = SDL_RenderCopy(muptSdlRenderer.get(), m_uptRotatedTexture.get(), nullptr, nullptr);
+		ASSERT(0 == r);
+
 		SDL_RenderPresent(muptSdlRenderer.get());
 		SDL_Delay(60);
 	}
@@ -182,4 +228,4 @@ Size Application::getScreenSize() {
 	return Size(w,h);
 }
 
-}}}
+}

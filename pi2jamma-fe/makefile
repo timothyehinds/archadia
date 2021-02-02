@@ -14,7 +14,8 @@ CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wsuggest-override -Werror -Wall -g -DDEBUG -O
 LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lm -lstdc++ -g
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	@echo Linking: $@
+	@$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s
@@ -23,13 +24,15 @@ $(BUILD_DIR)/%.s.o: %.s
 
 # c source
 $(BUILD_DIR)/%.c.o: %.c
-	$(MKDIR_P) $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	@$(MKDIR_P) $(dir $@)
+	@echo Compiling C: $<
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
-	$(MKDIR_P) $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	@$(MKDIR_P) $(dir $@)
+	@echo Compiling C++: $<
+	@$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
 .PHONY: clean

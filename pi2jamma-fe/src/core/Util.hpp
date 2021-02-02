@@ -7,54 +7,6 @@
 struct NULLTYPE { };
 typedef int OmNullType;
 
-#define OmLoop( TIMES, COUNTER ) for( OmUInt COUNTER = 0; COUNTER < TIMES; COUNTER ++ )
-#define OmLoopI( TIMES ) for ( OmUInt i = 0; i < TIMES; i ++ )
-#define OmLoopInf while( OmTrue )
-const size_t OmNullIndex = static_cast< size_t >( -1 );
-
-template< typename T1, typename T2, typename T3 >
-T1 OmClamp( const T1& v, const T2& min, const T3& max )
-{
-    if ( v < min )
-    {
-        return min;
-    }
-    else if ( v > max )
-    {
-        return max;
-    }
-    
-    return v;
-}
-
-template< typename T1, typename T2 >
-T1 OmMax( const T1& t1, const T2& t2 )
-{
-    if ( t1 > t2 )
-    {
-        return t1;
-    }
-    
-    return t2;
-}
-
-template< typename T  >
-T OmMin( const T& t1, const T& t2 )
-{
-    if ( t1 < t2 )
-    {
-        return t1;
-    }
-    
-    return t2;
-}
-
-template< typename T >
-T OmMin( const  T& x1, const  T& x2, const  T& x3 )
-{
-    return OmMin( OmMin( x1, x2 ), x3 );
-    
-}
 
 template< typename T >
 T OmPow( T b, T e )
@@ -63,14 +15,14 @@ T OmPow( T b, T e )
     
     if ( e >= 0 )
     {    
-        OmLoopI( e )
+        for(T i{0}; i < e; ++i)
         {
             res *= b;
         }
     }
     else
     {
-        OmLoopI( OmAbs( e ) )
+        for (T i{0}; i < Abs( e ); ++i)
         {
             res /= b;
         }
@@ -121,18 +73,6 @@ void OmSwap( T* p1, T* p2 )
     *p2 = temp;
 }
 
-template < typename T >
-inline OmBool OmIsValid( T t )
-{
-    return ( 0 != t );
-}
-
-template< typename T >
-inline OmBool OmIsValid( T* pT )
-{
-    return 0 != pT;
-}
-
 template< typename T >
 inline OmBool OmSetIfValid( T* pT, typename Arg< T >::Type  value )
 {
@@ -160,7 +100,7 @@ inline void OmClearMem( void* pMem, OmUInt bytes )
 {
     OmChar* pBytes = reinterpret_cast< OmChar* > ( pMem );
 
-    OmLoopI( bytes )
+    for (size_t i{0}; i < bytes; ++i)
     {
         pBytes[ i ] = 0;
     } 

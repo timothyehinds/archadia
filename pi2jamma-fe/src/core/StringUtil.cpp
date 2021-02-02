@@ -9,8 +9,8 @@ OmStringEscapeItem OM_STRING_C_ESCAPE_ITEM_VALUES[] = {
     { "\"", "\\\"" } };
 
 OmStringEscapeItems OM_STRING_C_ESCAPE_ITEMS = {
-        OM_STRING_C_ESCAPE_ITEM_VALUES,
-        sizeof ( OM_STRING_C_ESCAPE_ITEM_VALUES ) / sizeof( OmStringEscapeItem ) };
+    OM_STRING_C_ESCAPE_ITEM_VALUES,
+    sizeof ( OM_STRING_C_ESCAPE_ITEM_VALUES ) / sizeof( OmStringEscapeItem ) };
 
 void OmStringEscape(
     std::string& stringOut,

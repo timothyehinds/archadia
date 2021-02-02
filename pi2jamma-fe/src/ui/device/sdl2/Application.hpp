@@ -11,7 +11,7 @@
 #include "ui/device/sdl2/Surface.hpp"
 #include "ui/device/sdl2/Font.hpp"
 
-namespace ui { namespace device { namespace sdl2 {
+namespace ui::device::sdl2 {
 
 class Application
 {
@@ -53,6 +53,10 @@ private:
 
 	std::unique_ptr<SDL_Renderer> muptSdlRenderer;
 	std::unique_ptr<SDL_Window> muptSdlWindow;
+	std::unique_ptr<SDL_Texture> m_uptUnRotatedTexture;
+	std::unique_ptr<SDL_Texture> m_uptRotatedTexture;
+
+	ref<Surface> mrefBackBuffer;
 
 	static Application* spSingleton;
 
@@ -69,4 +73,4 @@ inline void Application::quit()
 	mQuit = true;
 }
 
-}}}
+}

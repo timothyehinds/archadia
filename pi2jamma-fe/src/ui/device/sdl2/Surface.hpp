@@ -4,9 +4,7 @@
 #include "ui/device/sdl2/Size.hpp"
 #include "core/RefCounted.hpp"
 
-namespace ui {
-namespace device {
-namespace sdl2 {
+namespace ui::device::sdl2 {
 
 class Surface : public RefCounted
 {
@@ -49,5 +47,5 @@ inline SDL_Texture* Surface:: getSdlTexture() const
 	return muptSdlTexture.get();
 }
 
-}}}
+}
 

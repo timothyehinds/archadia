@@ -493,7 +493,7 @@ Result JsonReadStream< ParserType >::parseUnicodeSequence( CharType* pRes )
 {
     CharType value = 0;
     
-    OmLoopI( 4 )
+    for(size_t i{0}; i < 4; ++i)
     {
         CharType c;
         
