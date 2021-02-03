@@ -42,8 +42,8 @@ ref<BitmapFont> BitmapFont::fromFont(
 BitmapFont::BitmapFont(
 	GlyphArray glyphArray,
 	UnitType glyphHeight)
-	: mGlyphArray(std::move(glyphArray))
-	, mGlyphHeight(glyphHeight)
+	: m_glyphArray(std::move(glyphArray))
+	, m_glyphHeight(glyphHeight)
 {
 }
 
@@ -54,11 +54,20 @@ void BitmapFont::render(
 	const HorizontalAlignment horizontalAlignment,
 	const VerticalAlignment verticalAlignment)
 {
-	Point point(rect.getX(), rect.getY());
+	UnitType xOffset{0};
+
+	if (horizontalAlignment == HorizontalAlignment::Center)
+	{
+		UnitType textWidth = getTextWidth(stringSpan);
+
+		xOffset = (rect.getWidth() - textWidth) / 2;
+	}
+
+	Point point(rect.getX() + xOffset, rect.getY());
 
 	for(auto&& c : stringSpan)
 	{
-		ref<Surface>& refSurface = mGlyphArray[c];
+		ref<Surface>& refSurface = m_glyphArray[c];
 
 		if(!refSurface)
 		{
@@ -77,18 +86,19 @@ void BitmapFont::render(
 	}
 }
 
-#if 0
-	auto fitRects =
-		fitRect(
-			Rect(
-				Point(0, 0),
-				mrefSurface->getSize()),
-			getRect(),
-			CropMode::None,
-			HorizontalAlignment::Left,
-			VerticalAlignment::Center,
-			mHorizontalAlignment,
-			mVerticalAlignment);
-#endif
+UnitType BitmapFont::getTextWidth(const StringSpan stringSpan)
+{
+	UnitType width{0};
 
+	for(const char c : stringSpan)
+	{
+		if (const ref<Surface> refSurface{m_glyphArray[c]})
+		{
+			width += refSurface->getWidth();
+		}
+	}
+
+	return width;
 }
+
+} // namespaces

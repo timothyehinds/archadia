@@ -26,7 +26,8 @@ public:
 
 	BitmapFont(GlyphArray glyphArray, UnitType glyphHeight);
 
-	UnitType getHeight() const;	
+	UnitType getHeight() const;
+	UnitType getTextWidth(StringSpan);
 
 	void render(
 		RenderContext&,
@@ -37,13 +38,13 @@ public:
 
 private:
 
-	GlyphArray mGlyphArray;
-	UnitType mGlyphHeight;
+	GlyphArray m_glyphArray;
+	UnitType m_glyphHeight;
 };
 
 inline UnitType BitmapFont::getHeight() const
 {
-	return mGlyphHeight;
+	return m_glyphHeight;
 }
 
 }
