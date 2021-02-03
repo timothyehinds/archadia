@@ -28,7 +28,8 @@ ref<BitmapFont> BitmapFont::fromFont(
 				color,
 				c);
 
-		if (refSurface.isValid()) {
+		if (refSurface)
+		{
 			glyphHeight = std::max(glyphHeight, refSurface->getHeight());
 		}
 
@@ -48,16 +49,19 @@ BitmapFont::BitmapFont(
 
 void BitmapFont::render(
 	RenderContext& renderContext,
-	StringSpan stringSpan,
-	const Rect& rect)
+	const StringSpan stringSpan,
+	const Rect& rect,
+	const HorizontalAlignment horizontalAlignment,
+	const VerticalAlignment verticalAlignment)
 {
 	Point point(rect.getX(), rect.getY());
 
 	for(auto&& c : stringSpan)
 	{
 		ref<Surface>& refSurface = mGlyphArray[c];
-		if(refSurface.isNull()) {
-	
+
+		if(!refSurface)
+		{
 			continue;
 		}
 
@@ -72,5 +76,19 @@ void BitmapFont::render(
 		}
 	}
 }
+
+#if 0
+	auto fitRects =
+		fitRect(
+			Rect(
+				Point(0, 0),
+				mrefSurface->getSize()),
+			getRect(),
+			CropMode::None,
+			HorizontalAlignment::Left,
+			VerticalAlignment::Center,
+			mHorizontalAlignment,
+			mVerticalAlignment);
+#endif
 
 }

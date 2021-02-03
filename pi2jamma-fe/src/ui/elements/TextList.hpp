@@ -51,8 +51,8 @@ private:
 	Color mUnselectedColor;
 	Color mSelectedColor;
 	UnitType mLineHeight;
-	HorizontalAlignment mHorizontalAlignment;
-	VerticalAlignment mVerticalAlignment;
+	HorizontalAlignment m_horizontalAlignment;
+	VerticalAlignment m_verticalAlignment;
 
 	ref<Surface> mrefSelectedSurface;
 

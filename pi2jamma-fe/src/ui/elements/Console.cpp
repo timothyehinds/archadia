@@ -29,7 +29,9 @@ void Console::render(RenderContext& renderContext)
 		mrefBitmapFont->render(
 			renderContext,
 			line,
-			rect);
+			rect,
+			HorizontalAlignment::Left,
+			VerticalAlignment::Center);
 
 		rect.setY(rect.getY() + fontHeight);
 	}

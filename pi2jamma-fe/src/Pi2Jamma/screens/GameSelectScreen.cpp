@@ -1,5 +1,7 @@
 #include "Pi2Jamma/screens/GameSelectScreen.hpp"
 
+#if 0
+
 #include "Pi2Jamma/Pi2JammaApplication.hpp"
 
 #include "ui/Point.hpp"
@@ -13,7 +15,7 @@ GameSelectScreen::GameSelectScreen(
 	const Games& games,
 	CStr fullThemeDir,
 	std::string snapsDir)
-	: ui::Element(
+	: Screen(
 		pParent,
 		rect)
 	, mApplication(application)
@@ -21,63 +23,7 @@ GameSelectScreen::GameSelectScreen(
 	, mSnapsDir(std::move(snapsDir))
 	, mGamesListModel(*this)
 {
-	std::string configFilePath =
-		joinPath(fullThemeDir, "config.txt");
 
-	Result result = loadJson(mTheme, configFilePath.c_str());
-	result.catastrophic();
-
-	mrefBackgroundImage =
-		make_ref<ui::Image>(
-			this,
-			getRect(),
-			joinPath(fullThemeDir, "background.png"));
-
-	mrefSnapsImage =
-		make_ref<ui::Image>(
-			this,
-			mTheme.getSnapsRect(),
-			gEmptyString);
-
-	ref<ui::Font> refFont;
-
-	result =
-		application.loadFont(
-			refFont,
-			mTheme.getMenuTextSize(),
-			joinPath(fullThemeDir, mTheme.getFontFilePath()));
-	
-	result.catastrophic();
-
-	mrefSelectedFont =
-		ui::BitmapFont::fromFont(
-			refFont,
-			mTheme.getMenuTextHighlightColor());
-
-	mrefUnselectedFont =
-		ui::BitmapFont::fromFont(
-			refFont,
-			mTheme.getMenuTextColor());
-	
-	mrefTitle =
-		make_ref<ui::Label>(
-			this,
-			mTheme.getTitleRect(),
-			refFont,
-			mTheme.getTitleTextColor(),
-			"Title",
-			mTheme.getTitleAlignment());
-
-	mrefTextList =
-		make_ref<ui::TextList>(
-			mGamesListModel,
-			this,
-			mTheme.getMenuRect(),
-			mrefSelectedFont,
-			mrefUnselectedFont,
-			mTheme.getMenuTextColor(),
-			mTheme.getMenuTextHighlightColor(),
-			mTheme.getMenuTextSize());
 }
 
 void GameSelectScreen::launchGame(const Game& game)
@@ -99,4 +45,6 @@ void GameSelectScreen::showSnapForGame(const Game& game)
 			mSnapsDir,
 			game.getSnapName()));
 }
+
+#endif
 

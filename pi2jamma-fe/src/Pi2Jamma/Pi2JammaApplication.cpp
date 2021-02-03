@@ -1,8 +1,8 @@
 #include "Pi2Jamma/Pi2JammaApplication.hpp"
 
 #include "Pi2Jamma/CommandLine/CommandLineHandlerConfigFile.hpp"
-#include "Pi2Jamma/Theme.hpp"
 #include "Pi2Jamma/screens/GameSelectScreen.hpp"
+#include "Pi2Jamma/screens/ScreenThemeDescription.hpp"
 
 #include "core/file/FilePath.hpp"
 #include "core/meta/Meta.hpp"
@@ -23,9 +23,9 @@ Result Pi2JammaApplication::initialize(int argc, const char* argv[])
 	ui::initialize();
 
 	Configuration::initialize();
-	Theme::initialize();
-	Game::initialize();
-	Games::initialize();
+	ScreenThemeDescription::initialize();
+	//Game::initialize();
+	//Games::initialize();
 
 	Result result = CommandLine::get().parse(argc, argv);
 	if(result.peekFailed()) {
@@ -70,9 +70,10 @@ Result Pi2JammaApplication::loadConfiguration()
 
 	// Load theme
 
-	mFullThemeDir =
+	m_fullThemeDir =
 		joinPath(themesDir, orientationDir, themeDir);
 
+#if 0
 	// Load Games
 
 	std::string gamesPath = joinPath(mDataDir, "games.txt");
@@ -81,6 +82,9 @@ Result Pi2JammaApplication::loadConfiguration()
 	if(result.peekFailed()) {
 		return result;
 	}
+	#endif
+
+
 
 	return Result::makeSuccess();
 }
@@ -90,19 +94,33 @@ Result Pi2JammaApplication::setupUi()
 		ui::Point(0, 0),
 		getScreenSize());
 
-	mrefRootElement =
+	m_refRootElement =
 		make_ref<ui::Element>(
 			nullptr,
 			screenRect);
 
-	mrefGameSelectScreen =
+	loadJson(m_screenThemeDescription, joinPath(m_fullThemeDir, "config.txt")).catastrophic();
+
+	ref<ScreenTheme> refScreenTheme{
+		make_ref<ScreenTheme>(
+			m_screenThemeDescription,
+			m_fullThemeDir.c_str())};
+
+	m_uptSettingsScreenController =
+		std::make_unique<SettingsScreenController>(
+			m_refRootElement.get(),
+			refScreenTheme);
+
+	/*mrefGameSelectScreen =
 		make_ref<GameSelectScreen>(
-			mrefRootElement.get(),
+			m_refRootElement.get(),
 			screenRect,
 			*this,
 			mGames,
-			mFullThemeDir,
-			mSnapsDir);
+			m_fullThemeDir,
+			mSnapsDir); */
+
+		
 
 	ref<ui::Font> refConsoleFont;
 	Result r = loadFont(
@@ -115,7 +133,7 @@ Result Pi2JammaApplication::setupUi()
 	}
 
 	mrefConsole = make_ref<ui::Console>(
-		mrefRootElement.get(),
+		m_refRootElement.get(),
 		screenRect,
 		ui::BitmapFont::fromFont(
 			refConsoleFont,
@@ -126,7 +144,7 @@ Result Pi2JammaApplication::setupUi()
 
 void Pi2JammaApplication::render(ui::RenderContext& renderContext)
 {
-	mrefRootElement->renderTree(renderContext);
+	m_refRootElement->renderTree(renderContext);
 }
 
 void Pi2JammaApplication::keyDownEvent(const ui::KeyDownEvent& keyDownEvent)
@@ -151,5 +169,5 @@ void Pi2JammaApplication::keyDownEvent(const ui::KeyDownEvent& keyDownEvent)
 		inputEvent.setAction(ui::Action::Select);
 	}
 
-	mrefRootElement->inputEvent(inputEvent);
+	m_refRootElement->inputEvent(inputEvent);
 }

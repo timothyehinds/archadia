@@ -4,10 +4,12 @@
 
 #include "ui/Color.hpp"
 #include "ui/Font.hpp"
+#include "ui/HorizontalAlignment.hpp"
 #include "ui/Rect.hpp"
 #include "ui/RenderContext.hpp"
 #include "ui/Size.hpp"
 #include "ui/Surface.hpp"
+#include "ui/VerticalAlignment.hpp"
 
 #include <array>
 
@@ -27,9 +29,11 @@ public:
 	UnitType getHeight() const;	
 
 	void render(
-		RenderContext& renderContext,
-		StringSpan stringSpan,
-		const Rect& rect);
+		RenderContext&,
+		StringSpan,
+		const Rect&,
+		HorizontalAlignment,
+		VerticalAlignment);
 
 private:
 

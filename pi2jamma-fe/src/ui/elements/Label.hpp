@@ -2,7 +2,7 @@
 
 #include "ui/elements/Element.hpp"
 #include "ui/Color.hpp"
-#include "ui/Font.hpp"
+#include "ui/BitmapFont.hpp"
 #include "ui/HorizontalAlignment.hpp"
 #include "ui/VerticalAlignment.hpp"
 #include "ui/Surface.hpp"
@@ -16,7 +16,7 @@ public:
 	Label(
 		Element* pParent,
 		const Rect& rect,
-		ref<Font> refFont,
+		ref<BitmapFont> refBitmapFont,
 		const Color& color,
 		std::string text,
 		HorizontalAlignment horizontalAlignment
@@ -30,13 +30,12 @@ protected:
 	
 private:
 
-
-	ref<Surface> mrefSurface;
-	ref<Font> mrefFont;
-	Color mColor;
-	std::string mText;
-	HorizontalAlignment mHorizontalAlignment;
-	VerticalAlignment mVerticalAlignment;
+	ref<Surface> m_refSurface;
+	ref<BitmapFont> m_refBitmapFont;
+	Color m_color;
+	std::string m_text;
+	HorizontalAlignment m_horizontalAlignment;
+	VerticalAlignment m_verticalAlignment;
 };
 
 }

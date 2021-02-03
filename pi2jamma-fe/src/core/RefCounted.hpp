@@ -58,7 +58,7 @@ class ref
 		T* get() const;
 
 		void abandon() {
-			mpT = nullptr;
+			m_pT = nullptr;
 		}
 
 		ref& operator=(const ref& rhs);
@@ -67,17 +67,20 @@ class ref
 		template<typename NewType>
 		ref<NewType> downCast() const;
 
-		bool isNull() const {
-			return (nullptr == mpT);
+		explicit operator bool() const
+		{
+			return nullptr != m_pT;
 		}
 
-		bool isValid() const {
-			return nullptr != mpT;
+		T& operator*() const
+		{
+			ASSERT(m_pT);
+			return *m_pT;
 		}
 
 	private:
 
-		T* mpT;
+		T* m_pT;
 };
 
 template<typename T, typename ...Params>
@@ -89,26 +92,26 @@ ref<T> make_ref(Params&&... params) {
 
 template<typename T >
 ref<T>::ref(T* pT)
-	: mpT(pT)
+	: m_pT(pT)
 {
-	if(nullptr != mpT) {
-		mpT->AddRef();
+	if(nullptr != m_pT) {
+		m_pT->AddRef();
 	}
 }
 
 template<typename T >
 ref<T>::ref(const ref<T>& rhs)
-	: mpT(rhs.mpT)
+	: m_pT(rhs.m_pT)
 {
-	if(nullptr != mpT) {
-		mpT->AddRef();
+	if(nullptr != m_pT) {
+		m_pT->AddRef();
 	}
 }
 
 template<typename T >
 template<typename RhsType>
 ref<T>::ref(ref<RhsType>&& rhs)
-	: mpT(rhs.get())
+	: m_pT(rhs.get())
 {
 	rhs.abandon();
 }
@@ -116,48 +119,48 @@ ref<T>::ref(ref<RhsType>&& rhs)
 template<typename T >
 template<typename RhsType>
 ref<T>::ref(const ref<RhsType>& rhs)
-	: mpT(rhs.get())
+	: m_pT(rhs.get())
 {
-	if(nullptr != mpT) {
-		mpT->AddRef();
+	if(nullptr != m_pT) {
+		m_pT->AddRef();
 	}
 }
 
 template<typename T >
 ref<T>::~ref()
 {
-	if(nullptr != mpT)
+	if(nullptr != m_pT)
 	{
-		mpT->Release();
+		m_pT->Release();
 	}
 }
 
 template<typename T>
 T* ref<T>::operator->() const
 {
-	ASSERT(nullptr != mpT);
-	return mpT;
+	ASSERT(nullptr != m_pT);
+	return m_pT;
 }
 
 template<typename T>
 T* ref<T>::get() const
 {
-	return mpT;
+	return m_pT;
 }
 
 template<typename T>
 ref<T>& ref<T>::operator=(const ref& rhs)
 {
-	if(nullptr != mpT)
+	if(nullptr != m_pT)
 	{
-		mpT->Release();
+		m_pT->Release();
 	}
 
-	mpT = rhs.mpT;
+	m_pT = rhs.m_pT;
 
-	if(nullptr != mpT)
+	if(nullptr != m_pT)
 	{
-		mpT->AddRef();
+		m_pT->AddRef();
 	}
 
 	return *this;
@@ -166,13 +169,13 @@ ref<T>& ref<T>::operator=(const ref& rhs)
 template<typename T>
 ref<T>& ref<T>::operator=(ref&& rhs)
 {
-	if(nullptr != mpT)
+	if(nullptr != m_pT)
 	{
-		mpT->Release();
+		m_pT->Release();
 	}
 
-	mpT = rhs.mpT;
-	rhs.mpT = nullptr;
+	m_pT = rhs.m_pT;
+	rhs.m_pT = nullptr;
 
 	return *this;
 }
@@ -180,5 +183,5 @@ ref<T>& ref<T>::operator=(ref&& rhs)
 template<typename T>
 template<typename NewType>
 ref<NewType> ref<T>::downCast() const {
-	return ::downCast<NewType*, T*>(mpT);
+	return ::downCast<NewType*, T*>(m_pT);
 }

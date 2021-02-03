@@ -1,10 +1,8 @@
 #pragma once
 
 #include "Pi2Jamma/Configuration/Configuration.hpp"
-#include "Pi2Jamma/games/Games.hpp"
-#include "Pi2Jamma/screens/GameSelectScreen.hpp"
-#include "Pi2Jamma/Theme.hpp"
-
+#include "Pi2Jamma/screens/ScreenThemeDescription.hpp"
+#include "Pi2Jamma/screens/SettingsScreenController.hpp"
 #include "ui/Application.hpp"
 #include "ui/KeyDownEvent.hpp"
 #include "ui/RenderContext.hpp"
@@ -31,14 +29,16 @@ private:
 	Result setupUi();
 
 	Configuration mConfiguration;
-	Games mGames;
-	Theme mTheme;
 
 	CStr mDataDir;
-	std::string mFullThemeDir;
+	std::string m_fullThemeDir;
 	std::string mSnapsDir;
 
-	ref<ui::Element> mrefRootElement;
+	ref<ui::Element> m_refRootElement;
 	ref<ui::Console> mrefConsole;
-	ref<GameSelectScreen> mrefGameSelectScreen;
+
+	ScreenThemeDescription m_screenThemeDescription;
+	std::unique_ptr<SettingsScreenController> m_uptSettingsScreenController;
+
+	
 };

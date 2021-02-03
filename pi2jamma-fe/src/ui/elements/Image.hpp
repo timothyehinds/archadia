@@ -11,8 +11,17 @@ class Image final : public Element
 
 		Image(
 			Element* pParent,
+			const Rect& rect);
+
+		Image(
+			Element* pParent,
 			const Rect& rect,
 			CStr filePath);
+
+		Image(
+			Element* pParent,
+			const Rect& rect,
+			ref<Surface> refSurface);
 
 		void loadFromFile(CStr filePath);
 		void setSurface(ref<ui::Surface> refSurface);
@@ -23,7 +32,7 @@ class Image final : public Element
 
 	private:
 
-		ref<ui::Surface> mrefSurface;
+		ref<ui::Surface> m_refSurface;
 };
 
 }

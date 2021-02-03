@@ -25,8 +25,8 @@ TextList::TextList(
 	, mUnselectedColor(unselectedColor)
 	, mSelectedColor(selectedColor)
 	, mLineHeight(lineHeight)
-	, mHorizontalAlignment(horizontalAlignment)	
-	, mVerticalAlignment(verticalAlignment)
+	, m_horizontalAlignment(horizontalAlignment)	
+	, m_verticalAlignment(verticalAlignment)
 {
 	auto numItems = mListModel.getNumItems();
 
@@ -125,8 +125,9 @@ void TextList::render(RenderContext& renderContext)
 		refFont->render(
 			renderContext,
 			mListModel.getItem(i),
-			targetRect);
-
+			targetRect,
+			m_horizontalAlignment,
+			m_verticalAlignment);
 
 		#if 0
 		auto fitResult =

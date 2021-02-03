@@ -5,6 +5,13 @@ namespace ui {
 
 Image::Image(
 	Element* pParent,
+	const Rect& rect)
+	: Element(pParent, rect)
+{
+}
+
+Image::Image(
+	Element* pParent,
 	const Rect& rect,
 	CStr filePath)
 	: Element(pParent, rect)
@@ -12,14 +19,25 @@ Image::Image(
 	loadFromFile(filePath);
 }
 
+Image::Image(
+	Element* pParent,
+	const Rect& rect,
+	ref<Surface> refSurface)
+	: Element(pParent, rect)
+	, m_refSurface{std::move(refSurface)}
+{
+}
+
+
 void Image::render(RenderContext& renderContext)
 {
-	if(mrefSurface.isNull()) {
+	if(!m_refSurface)
+	{
 		return;
 	}
 
 	renderContext.draw(
-		mrefSurface,
+		m_refSurface,
 		getRect().getPosition());
 }
 
@@ -27,18 +45,18 @@ void Image::loadFromFile(CStr filePath)
 {
 	if(filePath.empty())
 	{
-		mrefSurface = nullptr;
+		m_refSurface = nullptr;
 		return;
 	}
 
 	Application::get().loadSurface(
-		mrefSurface,
+		m_refSurface,
 		filePath).ignore();
 }
 
 void Image::setSurface(ref<ui::Surface> refSurface)
 {
-	mrefSurface = std::move(refSurface);
+	m_refSurface = std::move(refSurface);
 }
 
 }

@@ -1,5 +1,6 @@
 #include "Pi2Jamma/screens/GamesListModel.hpp"
 
+#if 0
 #include "Pi2Jamma/screens/GameSelectScreen.hpp"
 
 GamesListModel::GamesListModel(
@@ -37,3 +38,5 @@ void GamesListModel::onSelect(size_t newSelection)
 			.getGames()
 				.getGameList()[newSelection]);
 }
+
+#endif

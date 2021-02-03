@@ -10,49 +10,30 @@ namespace ui {
 Label::Label(
 	Element* pParent,
 	const Rect& rect,
-	ref<Font> refFont,
+	ref<BitmapFont> refBitmapFont,
 	const Color& color,
 	std::string text,
 	HorizontalAlignment horizontalAlignment,
 	VerticalAlignment verticalAlignment)
 	: Element(pParent, rect)
-	, mrefFont(std::move(refFont))
-	, mColor(color)
-	, mText(std::move(text))
-	, mHorizontalAlignment(horizontalAlignment)
-	, mVerticalAlignment(verticalAlignment)
-
+	, m_refBitmapFont(std::move(refBitmapFont))
+	, m_color(color)
+	, m_text(std::move(text))
+	, m_horizontalAlignment(horizontalAlignment)
+	, m_verticalAlignment(verticalAlignment)
 {
-	Result r =
-		Application::get().renderText(
-			mrefSurface,
-			mrefFont,
-			mColor,
-			mText.c_str());
-
-	r.ignore();
 }
 
 
 void Label::render(RenderContext& renderContext)
 {
-	auto fitRects =
-		fitRect(
-			Rect(
-				Point(0, 0),
-				mrefSurface->getSize()),
-			getRect(),
-			CropMode::None,
-			HorizontalAlignment::Left,
-			VerticalAlignment::Center,
-			mHorizontalAlignment,
-			mVerticalAlignment);
-
-	renderContext.draw(
-		mrefSurface,
-		fitRects.getTargetRect(),
-		fitRects.getSourceRect());
+	m_refBitmapFont->render(
+		renderContext,
+		m_text.c_str(),
+		getRect(),
+		m_horizontalAlignment,
+		m_verticalAlignment);
 }
 
-}
+} // namespaces
 
