@@ -12,16 +12,17 @@ size_t Screen::ListModel::getNumItems()
 
 CStr Screen::ListModel::getItem(const size_t index)
 {
-	return m_screen.m_nnpModel.get().getItem(index).m_itemText;
+	return m_screen.m_nnpModel.get().getItemText(index);
 }
 
 void Screen::ListModel::onHighlighted(const size_t index)
 {
-	m_screen.m_refSnapsImage->setSurface(m_screen.m_nnpModel.get().getItem(index).m_refSnapsTexture);
+	m_screen.m_refSnapsImage->setSurface(m_screen.m_nnpModel.get().getItemSurface(index));
 }
 
-void Screen::ListModel::onSelect(size_t newSelection)
+void Screen::ListModel::onSelect(const size_t newSelection)
 {
+	m_screen.m_nnpModel.get().onItemSelected(newSelection);
 }
 
 Screen::Screen(

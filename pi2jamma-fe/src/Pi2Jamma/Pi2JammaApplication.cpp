@@ -1,8 +1,8 @@
 #include "Pi2Jamma/Pi2JammaApplication.hpp"
 
 #include "Pi2Jamma/CommandLine/CommandLineHandlerConfigFile.hpp"
-#include "Pi2Jamma/screens/GameSelectScreen.hpp"
-#include "Pi2Jamma/screens/ScreenThemeDescription.hpp"
+#include "Pi2Jamma/screens/ScreenTheme.hpp"
+#include "Pi2Jamma/screens/SettingsScreenController.hpp"
 
 #include "core/file/FilePath.hpp"
 #include "core/meta/Meta.hpp"
@@ -106,10 +106,13 @@ Result Pi2JammaApplication::setupUi()
 			m_screenThemeDescription,
 			m_fullThemeDir.c_str())};
 
-	m_uptSettingsScreenController =
-		std::make_unique<SettingsScreenController>(
-			m_refRootElement.get(),
-			refScreenTheme);
+	std::unique_ptr<SettingsScreenController> uptSettingsScreenController{
+		std::make_unique<SettingsScreenController>(refScreenTheme)};
+
+	m_screenControllerStack.push(
+		m_refRootElement.get(),
+		m_refRootElement->getRect(),
+		std::move(uptSettingsScreenController));
 
 	/*mrefGameSelectScreen =
 		make_ref<GameSelectScreen>(

@@ -18,35 +18,52 @@ size_t SettingsScreenController::SettingsScreenModel::getNumItems()
     return 2;
 }
 
-ScreenModel::Item SettingsScreenController::SettingsScreenModel::getItem(
-    const size_t i)
+CStr SettingsScreenController::SettingsScreenModel::getItemText(const size_t i)
 {
     if (0 == i)
     {
-        return ScreenModel::Item{"Launch Retroarch"};
+        return "Launch Retroarch";
     }
 
-    return ScreenModel::Item{"Screen Orientation"};
+    return "Screen Orientation";
 }
 
-void SettingsScreenController::SettingsScreenModel::itemSelected(size_t)
+ref<ui::Surface> SettingsScreenController::SettingsScreenModel::getItemSurface(const size_t i)
 {
-    //System::exec("retroarch");
+    return nullptr;
+}
+
+void SettingsScreenController::SettingsScreenModel::onItemSelected(const size_t)
+{
+    std::string output;
+    Result r{System::exec("retroarch -c ../data/retroarch.cfg", output)};
+    r.ignore();
 }
 
 //------------------------------------------------------------------------------
 
 SettingsScreenController::SettingsScreenController(
-    ui::Element* pParent,
     ref<ScreenTheme> refScreenTheme)
     : m_screenModel{*this}
+    , m_refScreenTheme{std::move(refScreenTheme)}
+{
+        
+}
+
+ref<ui::Element> SettingsScreenController::activate(ui::Element* pParent, const ui::Rect& rect)
 {
     m_refScreen =
         make_ref<Screen>(
             pParent,
-            pParent->getRect(),
-            refScreenTheme,
+            rect,
+            m_refScreenTheme,
             m_screenModel);
-            
+
+    return m_refScreen;
+}
+
+void SettingsScreenController::deactivate()
+{
+    m_refScreen = nullptr;
 }
 

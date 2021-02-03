@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Pi2Jamma/Configuration/Configuration.hpp"
+#include "Pi2Jamma/screens/ScreenControllerStack.hpp"
 #include "Pi2Jamma/screens/ScreenThemeDescription.hpp"
-#include "Pi2Jamma/screens/SettingsScreenController.hpp"
 #include "ui/Application.hpp"
 #include "ui/KeyDownEvent.hpp"
 #include "ui/RenderContext.hpp"
@@ -38,7 +38,5 @@ private:
 	ref<ui::Console> mrefConsole;
 
 	ScreenThemeDescription m_screenThemeDescription;
-	std::unique_ptr<SettingsScreenController> m_uptSettingsScreenController;
-
-	
+	ScreenControllerStack m_screenControllerStack;
 };

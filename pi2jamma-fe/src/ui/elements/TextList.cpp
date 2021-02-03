@@ -128,25 +128,6 @@ void TextList::render(RenderContext& renderContext)
 			targetRect,
 			m_horizontalAlignment,
 			m_verticalAlignment);
-
-		#if 0
-		auto fitResult =
-			fitRect(
-				Rect(
-					Point(0, 0),
-					refSurface->getSize()),
-				targetRect,
-				CropMode::None,
-				HorizontalAlignment::Left,
-				VerticalAlignment::Center,
-				mHorizontalAlignment,
-				mVerticalAlignment);
-
-		renderContext.draw(
-			refSurface,
-			fitResult.getTargetRect(),
-			fitResult.getSourceRect());
-		#endif
 	}
 }
 

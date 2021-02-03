@@ -1,17 +1,19 @@
 #pragma once
 
 #include "Pi2Jamma/screens/Screen.hpp"
+#include "Pi2Jamma/screens/ScreenController.hpp"
 #include "Pi2Jamma/screens/ScreenModel.hpp"
 
-class SettingsScreenController
+class SettingsScreenController : public ScreenController
 {
 public:
-    SettingsScreenController(
-        ui::Element* pParent,
-        ref<ScreenTheme>);
+    SettingsScreenController(ref<ScreenTheme>);
 
     SettingsScreenController(const SettingsScreenController&) = delete;
     SettingsScreenController& operator=(const SettingsScreenController&) = delete;
+
+    virtual ref<ui::Element> activate(ui::Element* pParent, const ui::Rect& rect) override;
+    virtual void deactivate() override;
 private:
 
     class SettingsScreenModel : public ScreenModel
@@ -21,8 +23,9 @@ private:
 
         virtual CStr getTitle() override;
         virtual size_t getNumItems() override;
-        virtual Item getItem(size_t) override;
-        virtual void itemSelected(size_t) override;    
+        virtual CStr getItemText(size_t) override;
+        virtual ref<ui::Surface> getItemSurface(size_t) override;
+        virtual void onItemSelected(size_t) override;    
     private:
         NotNullPtr<SettingsScreenController> m_nnpController;
     };
@@ -30,4 +33,5 @@ private:
     SettingsScreenModel m_screenModel;
 
     ref<Screen> m_refScreen;    
+    ref<ScreenTheme> m_refScreenTheme;
 };
