@@ -58,21 +58,21 @@ MetaType* Meta::findType(const std::type_info& typeInfo) {
 	return pMetaType;
 }
 
-Result Meta::findType(
+Result<Success> Meta::findType(
 	MetaType*& pMetaTypeOut,
 	const std::type_info& typeInfo)
 {
 	pMetaTypeOut = findType(typeInfo);
-	if(nullptr == pMetaTypeOut)
+	if(!pMetaTypeOut)
 	{
 		return
-			Result::makeFailureWithString(
+			Result<Success>::makeFailureWithString(
 				formatString(
 					"%s is not registered with the meta system.",
 					typeInfo.name()));
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 

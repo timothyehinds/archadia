@@ -16,9 +16,9 @@ public:
 	File();
 	~File();
 
-	Result open(CStr filePath, OpenMode openMOde);
-	Result readExactly(void* pBuf, FileSize bytes);
-	Result getSize(FileSize& size);
+	[[nodiscard]] Result<Success> open(CStr filePath, OpenMode);
+	[[nodiscard]] Result<Success> readExactly(void* pBuf, FileSize bytes);
+	[[nodiscard]] Result<FileSize> getSize();
 
 	void close();
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Pi2Jamma/screens/GameDatabase.hpp"
 #include "Pi2Jamma/screens/Screen.hpp"
 #include "Pi2Jamma/screens/ScreenController.hpp"
 
@@ -9,11 +10,11 @@ public:
 	GameSelectScreenController(
         ref<ScreenTheme>);
 
-    virtual ref<ui::Element> activate(
+    virtual ref<ui::Element> onActivate(
 		ui::Element* pParent,
 		const ui::Rect&) override;
 
-    virtual void deactivate() override;
+    virtual void onDeactivate() override;
 
 private:
 	class GameSelectScreenModel : public ScreenModel
@@ -30,6 +31,7 @@ private:
 		GameSelectScreenController& m_controller;
 	};
 
+	Games m_gameDatabase;
 	GameSelectScreenModel m_screenModel;
 	ref<ScreenTheme> m_refScreenTheme;
 	ref<Screen> m_refScreen;

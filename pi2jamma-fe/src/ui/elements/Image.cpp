@@ -49,9 +49,12 @@ void Image::loadFromFile(CStr filePath)
 		return;
 	}
 
-	Application::get().loadSurface(
-		m_refSurface,
-		filePath).ignore();
+	if (Result<ref<Surface>> resultSurface{
+		Application::get().loadSurface(
+			filePath)})
+	{
+		m_refSurface = *resultSurface;
+	}
 }
 
 void Image::setSurface(ref<ui::Surface> refSurface)

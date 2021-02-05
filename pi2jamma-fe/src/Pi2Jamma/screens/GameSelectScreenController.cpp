@@ -1,5 +1,7 @@
 #include "Pi2Jamma/screens/GameSelectScreenController.hpp"
 
+#include <filesystem>
+
 GameSelectScreenController::GameSelectScreenModel::GameSelectScreenModel(GameSelectScreenController& controller)
 	: m_controller(controller)
 {
@@ -37,9 +39,10 @@ GameSelectScreenController::GameSelectScreenController(
 	: m_screenModel{*this}
 	, m_refScreenTheme{std::move(refScreenTheme)}
 {
+	m_gameDatabase.load("/home/x/.config/retroarch/cores", "./roms");
 }
 
-ref<ui::Element> GameSelectScreenController::activate(
+ref<ui::Element> GameSelectScreenController::onActivate(
 	ui::Element* pParent,
 	const ui::Rect& rect)
 {
@@ -47,7 +50,7 @@ ref<ui::Element> GameSelectScreenController::activate(
 	return m_refScreen;
 }
 
-void GameSelectScreenController::deactivate()
+void GameSelectScreenController::onDeactivate()
 {
 	m_refScreen = nullptr;
 }

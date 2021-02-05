@@ -8,11 +8,11 @@
 #include "core/serialize/json/JsonWriteStream.hpp"
 
 template<typename T>
-Result loadJson(T& t, CStr fileName)
+Result<Success> loadJson(T& t, CStr fileName)
 {
 	std::vector<char> fileData;
-	Result r = readFile(fileName, fileData);
-	if(r.peekFailed()){
+	Result<Success> r = readFile(fileName, fileData);
+	if(!r){
 		return r;
 	}
 
@@ -32,11 +32,11 @@ Result loadJson(T& t, CStr fileName)
 };
 
 template<typename T>
-Result saveJson(const T& t, CStr fileName)
+Result<Success> saveJson(const T& t, CStr fileName)
 {
 	File file;
-	Result r = file.open(fileName, File::OpenMode::Write);
-	if(r.peekFailed()) {
+	Result<Success> r = file.open(fileName, File::OpenMode::Write);
+	if(!r) {
 		return r;
 	}
 
@@ -53,7 +53,7 @@ public:
 		: mString(s)
 	{}
 
-	Result write(const void* pVoidData, size_t numBytes) {
+	Result<Success> write(const void* pVoidData, size_t numBytes) {
 		const char* pCharData =
 			reinterpret_cast<const char*>(pVoidData);
 
@@ -62,7 +62,7 @@ public:
 			pCharData,
 			numBytes);
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 
 private:
@@ -76,7 +76,7 @@ std::string dump(const T& t)
 	StringWriteStream stringWriteStream(s);
 	JsonWriteStream<StringWriteStream>
 		jsonWriteStream(stringWriteStream);
-	Result r = save(t, jsonWriteStream);
+	Result<Success> r = save(t, jsonWriteStream);
 	r.catastrophic();
 	return s;
 }

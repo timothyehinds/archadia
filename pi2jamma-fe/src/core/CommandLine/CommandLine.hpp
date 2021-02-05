@@ -9,7 +9,7 @@ public:
 	void addHandler(CommandLineHandler& handler);
 	void removeHandler(CommandLineHandler& handler);
 
-	Result parse(int argc, const char* argv[]);
+	Result<Success> parse(int argc, const char* argv[]);
 	void printHelp() const;
 
 private:

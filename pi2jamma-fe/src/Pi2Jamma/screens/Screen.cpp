@@ -35,13 +35,6 @@ Screen::Screen(
     , m_refTheme{std::move(refTheme)}
 	, m_nnpModel{std::move(nnpScreenModel)}
 {
-		/*
-   std::string configFilePath =
-		joinPath(fullThemeDir, "config.txt");
-
-	Result result = loadJson(mTheme, configFilePath.c_str());
-	result.catastrophic(); */
-
 	const ScreenTheme& theme{*m_refTheme};
 
 	const ScreenThemeDescription& themeDescription{
@@ -64,7 +57,7 @@ Screen::Screen(
 			themeDescription.getTitleRect(),
 			theme.getTitleBitmapFont(),
 			themeDescription.getTitleTextColor(),
-			"Title",
+			nnpScreenModel.get().getTitle().c_str(),
 			themeDescription.getTitleAlignment());
 
 	m_refTextList =

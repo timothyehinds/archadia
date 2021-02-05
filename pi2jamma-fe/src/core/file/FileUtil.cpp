@@ -2,25 +2,29 @@
 
 #include "core/file/File.hpp"
 
-Result readFile(CStr filename, std::vector<char>& data)
+Result<Success> readFile(CStr filename, std::vector<char>& data)
 {
 	File file;
-	Result r = file.open(filename, File::OpenMode::Read);
-	if(r.peekFailed()) {
+	Result<Success> r = file.open(filename, File::OpenMode::Read);
+	
+	if(!r)
+	{
 		return r;
 	}
 
-	FileSize fileSize = 0;
-	r = file.getSize(fileSize);
-	if(r.peekFailed()){
+	Result<FileSize> resultFileSize{file.getSize()};
+	if(!resultFileSize)
+	{
+		return Result<Success>{resultFileSize.moveError()};
+	}
+
+	data.resize(*resultFileSize);
+	r = file.readExactly(data.data(), *resultFileSize);
+
+	if(!r)
+	{
 		return r;
 	}
 
-	data.resize(fileSize);
-	r = file.readExactly(data.data(), fileSize);
-	if(r.peekFailed()){
-		return r;
-	}
-
-	return Result::makeSuccess();
+	return Result{Success{}};
 }

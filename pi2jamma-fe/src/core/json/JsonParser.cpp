@@ -7,13 +7,13 @@ Result JsonLoadFromFile( Json& json, const char* pFilename )
 {
     File file;
     Result r = file.open(pFilename, File::OpenMode::Read);
-    if(r.peekFailed()) {
+    if(!r) {
         return r;
     }
 
     FileSize fileSize = 0;
     r = file.getSize(fileSize);
-    if(r.peekFailed()) {
+    if(!r) {
         return r;
     }
 
@@ -21,7 +21,7 @@ Result JsonLoadFromFile( Json& json, const char* pFilename )
     s.resize(fileSize);
 
     r = file.readExactly(s.data(), s.size());
-    if (r.peekFailed()) {
+    if (!r) {
         return r;
     }
 

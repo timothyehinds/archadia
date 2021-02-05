@@ -2,6 +2,10 @@
 
 #include "core/system.hpp"
 
+#include "Pi2Jamma/screens/ScreenControllerStack.hpp"
+#include "Pi2Jamma/screens/SettingsScreenController.hpp"
+#include "Pi2Jamma/screens/GameSelectScreenController.hpp"
+
 SettingsScreenController::SettingsScreenModel::SettingsScreenModel(
     NotNullPtr<SettingsScreenController> nnpController)
     : m_nnpController{nnpController}
@@ -22,10 +26,14 @@ CStr SettingsScreenController::SettingsScreenModel::getItemText(const size_t i)
 {
     if (0 == i)
     {
+        return "Games";
+    }
+    else if (1 == i)
+    {
         return "Launch Retroarch";
     }
 
-    return "Screen Orientation";
+    return "";
 }
 
 ref<ui::Surface> SettingsScreenController::SettingsScreenModel::getItemSurface(const size_t i)
@@ -33,11 +41,19 @@ ref<ui::Surface> SettingsScreenController::SettingsScreenModel::getItemSurface(c
     return nullptr;
 }
 
-void SettingsScreenController::SettingsScreenModel::onItemSelected(const size_t)
+void SettingsScreenController::SettingsScreenModel::onItemSelected(const size_t i)
 {
-    std::string output;
-    Result r{System::exec("retroarch -c ../data/retroarch.cfg", output)};
-    r.ignore();
+    if (0 == i)
+    {
+        m_nnpController.get().getScreenControllerStack().push(
+            std::make_unique<GameSelectScreenController>(
+                m_nnpController.get().m_refScreenTheme));
+    }
+    else if (1 == i)
+    {
+        std::string output;
+        Result<Success> r{System::exec("retroarch -c ../data/retroarch.cfg", output)};
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -50,7 +66,7 @@ SettingsScreenController::SettingsScreenController(
         
 }
 
-ref<ui::Element> SettingsScreenController::activate(ui::Element* pParent, const ui::Rect& rect)
+ref<ui::Element> SettingsScreenController::onActivate(ui::Element* pParent, const ui::Rect& rect)
 {
     m_refScreen =
         make_ref<Screen>(
@@ -62,7 +78,7 @@ ref<ui::Element> SettingsScreenController::activate(ui::Element* pParent, const 
     return m_refScreen;
 }
 
-void SettingsScreenController::deactivate()
+void SettingsScreenController::onDeactivate()
 {
     m_refScreen = nullptr;
 }

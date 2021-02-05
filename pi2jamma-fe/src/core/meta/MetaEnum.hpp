@@ -78,31 +78,36 @@ public:
 		return mValuesByValue.find(value);
 	}
 
-	Result findValue(const MetaEnumValueBase*& vb, CStr name) const {
-		vb = findValue(name);
+	Result<const MetaEnumValueBase*> findValueResult(const CStr name) const
+	{
+		const MetaEnumValueBase* vb = findValue(name);
 		if(nullptr == vb) {
-			return Result::makeFailureWithString(
+			return Result<const MetaEnumValueBase*>::makeFailureWithString(
 				formatString(
 					"%s is not a valid %s enum value.",
 					name.c_str(),
 					getName().c_str()));
 		}
 
-		return Result::makeSuccess();
+		return Result<const MetaEnumValueBase*>{vb};
 	}
 
-	Result findValue(const MetaEnumValueBase*& vb, uint64_t value) const {
-		vb = findValue(value);
-		if(nullptr == vb) {
-			return Result::makeFailureWithString(
+	Result<const MetaEnumValueBase*> findValueResult(const uint64_t value) const
+	{
+		const MetaEnumValueBase* pV{findValue(value)};
+
+		if(!pV)
+		{
+			return Result<const MetaEnumValueBase*>::makeFailureWithString(
 				formatString(
 					"%d is not a valid %s enum value.",
 					(int) value,
 					getName().c_str()));
 		}
 
-		return Result::makeSuccess();
+		return Result<const MetaEnumValueBase*>{pV};
 	}
+
 	const MetaEnumValueBase* findValue(CStr name) const {
 		return mValuesByName.find(name);
 	}
@@ -138,45 +143,42 @@ public:
 		: MetaEnumBase(pName, sizeof(T), typeid(T))
 	{}
 
-	virtual Result load(void* pVoidEnum, ObjectReadStream& readStream) const override
+	virtual Result<Success> load(void* pVoidEnum, ObjectReadStream& readStream) const override
 	{
 		std::string valueName;
-		Result r = readStream.readCVariableName(valueName);
-		if(r.peekFailed()){
+		Result<Success> r = readStream.readCVariableName(valueName);
+		if(!r)
+		{
 			return r;
 		}
 
-		const MetaEnumValueBase* pValueBase = 0;
+		Result<const MetaEnumValueBase*> resEnumValue = findValue(valueName.c_str());
 
-		r = findValue(pValueBase, valueName.c_str());
-
-		if(r.peekFailed()) {
-			return r;
+		if(!resEnumValue)
+		{
+			return Result<Success>{resEnumValue.moveError()};
 		}
 
-		const MetaEnumValue<T>* pValue =
-			downCast<const MetaEnumValue<T>*>(
-				pValueBase);
+		const MetaEnumValue<T>* pValue = downCast<const MetaEnumValue<T>*>(*resEnumValue);
 
 		T* pT = static_cast<T*>(pVoidEnum);
 
 		(*pT) = static_cast<T>(pValue->getTypedValue());
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 
-	virtual Result save(const void* pVoidEnum, ObjectWriteStream& writeStream) const override
+	virtual Result<Success> save(const void* pVoidEnum, ObjectWriteStream& writeStream) const override
 	{
 		const T* pEnum = static_cast<const T*>(pVoidEnum);
 
-		const MetaEnumValueBase* pValueBase = nullptr;
-
-		Result r = findValue(pValueBase, static_cast<uint64_t>(*pEnum));
-		if(r.peekFailed()) {
-			return r;
+		Result<const MetaEnumValueBase*> r = findValue(static_cast<uint64_t>(*pEnum));
+		if(!r)
+		{
+			return Result<Success>{r.moveError()};
 		}
 
-		return writeStream.writeCVariableName(pValueBase->getName());
+		return writeStream.writeCVariableName((*r)->getName());
 	}
 };
 

@@ -12,8 +12,8 @@ public:
     SettingsScreenController(const SettingsScreenController&) = delete;
     SettingsScreenController& operator=(const SettingsScreenController&) = delete;
 
-    virtual ref<ui::Element> activate(ui::Element* pParent, const ui::Rect& rect) override;
-    virtual void deactivate() override;
+    virtual ref<ui::Element> onActivate(ui::Element* pParent, const ui::Rect& rect) override;
+    virtual void onDeactivate() override;
 private:
 
     class SettingsScreenModel : public ScreenModel

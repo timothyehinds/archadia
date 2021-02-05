@@ -2,7 +2,6 @@
 
 #include "core/meta/Meta.hpp"
 
-
 MetaType::MetaType(
 	CStr name,
 	const std::type_info& typeInfo,

@@ -10,8 +10,8 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I/usr/include/SDL2
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wsuggest-override -Werror -Wall -g -DDEBUG -O0
-LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lm -lstdc++ -g
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wsuggest-override -Werror -Wall -g -DDEBUG -O0 --std=c++17
+LDFLAGS := -lSDL2 -lSDL2_image -lSDL2_ttf -lm -lstdc++ -g --std=c++17 -lstdc++fs
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	@echo Linking: $@

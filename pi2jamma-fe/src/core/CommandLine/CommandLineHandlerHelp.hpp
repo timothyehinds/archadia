@@ -6,7 +6,7 @@ class CommandLineHandlerHelp : public CommandLineHandler
 {
 public:
 	CommandLineHandlerHelp();
-	virtual Result parse(const char**& pS, const char** pEnd) override;
+	virtual Result<Success> parse(const char**& pS, const char** pEnd) override;
 	virtual CStr getHelp() const override;
 private:
 	static CommandLineHandlerHelp sSingleton;

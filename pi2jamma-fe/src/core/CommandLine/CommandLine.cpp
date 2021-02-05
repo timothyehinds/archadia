@@ -2,7 +2,10 @@
 
 #include "core/cast.hpp"
 #include "core/StringUtil.hpp"
-#include "core/file/FilePath.hpp"
+
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 CommandLine& CommandLine::get()
 {
@@ -10,7 +13,7 @@ CommandLine& CommandLine::get()
 	return sCommandLine;
 }
 
-Result CommandLine::parse(int argc, const char* argv[])
+Result<Success> CommandLine::parse(int argc, const char* argv[])
 {
 	mApplicationPath = argv[0];
 
@@ -28,7 +31,7 @@ Result CommandLine::parse(int argc, const char* argv[])
 			if(nullptr == pH) {
 				printHelp();
 				return
-					Result::makeFailureWithString(
+					Result<Success>::makeFailureWithString(
 						formatString(
 							"unrecognized argument: '%s'",
 							*ppCurrent ));
@@ -37,14 +40,14 @@ Result CommandLine::parse(int argc, const char* argv[])
 
 		ppCurrent++;
 
-		Result r = pH->parse(ppCurrent, ppEnd);
-		if (r.peekFailed()) {
+		Result<Success> r = pH->parse(ppCurrent, ppEnd);
+		if (!r) {
 			printHelp();
 			return r;
 		}
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 void CommandLine::printHelp() const
@@ -52,7 +55,7 @@ void CommandLine::printHelp() const
 	fprintf(
 		stderr,
 		"%s Help:\n",
-		getPathEntryName(mApplicationPath).c_str());
+		fs::path(mApplicationPath.c_str()).filename().c_str());
 
 	for(auto&& h : mHandlersByLongName)
 	{

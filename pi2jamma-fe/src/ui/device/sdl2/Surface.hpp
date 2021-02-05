@@ -8,9 +8,7 @@ namespace ui::device::sdl2 {
 
 class Surface : public RefCounted
 {
-
 public:
-
 	Surface() = default;
 	Surface(std::unique_ptr<SDL_Texture> uptSdlTexture);	
 
@@ -22,7 +20,6 @@ public:
 	SDL_Texture* getSdlTexture() const;
 
 private:
-
 	Size mSize;
 	std::unique_ptr<SDL_Texture> muptSdlTexture;
 };

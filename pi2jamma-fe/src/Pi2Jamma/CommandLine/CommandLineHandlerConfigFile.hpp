@@ -13,15 +13,15 @@ public:
 		return "Loction of the config file.";
 	}
 
-	virtual Result parse(const char**& ppToken, const char** ppEnd) override{
+	virtual Result<Success> parse(const char**& ppToken, const char** ppEnd) override{
 		if(ppToken >= ppEnd) {
-			return Result::makeFailureWithStringLiteral("Expected config file name.");
+			return Result<Success>::makeFailureWithStringLiteral("Expected config file name.");
 		}
 
 		mConfigFile = *ppToken;
 		ppToken++;
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 
 	CStr mConfigFile;

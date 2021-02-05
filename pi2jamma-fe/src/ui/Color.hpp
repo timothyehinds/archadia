@@ -12,6 +12,6 @@ using Color = device::sdl2::Color;
 template<>
 struct Serializer<ui::Color>
 {
-	static Result load(ui::Color& color, ObjectReadStream& readStream);
-	static Result save(const ui::Color& color, ObjectWriteStream& writeStream);	
+	static Result<Success> load(ui::Color& color, ObjectReadStream& readStream);
+	static Result<Success> save(const ui::Color& color, ObjectWriteStream& writeStream);	
 };

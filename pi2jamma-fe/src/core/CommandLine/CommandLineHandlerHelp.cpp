@@ -9,10 +9,10 @@ CommandLineHandlerHelp::CommandLineHandlerHelp()
 	: CommandLineHandler("--help", "-h")
 {}
 
-Result CommandLineHandlerHelp::parse(const char**& pS, const char** pEnd)
+Result<Success> CommandLineHandlerHelp::parse(const char**& pS, const char** pEnd)
 {
 	CommandLine::get().printHelp();
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 CStr CommandLineHandlerHelp::getHelp() const {

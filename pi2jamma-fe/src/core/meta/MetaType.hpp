@@ -34,8 +34,8 @@ public:
  	bool isClass() const;
  	bool isEnum() const;
 
-	virtual Result load(void* pItem, ObjectReadStream& readStream) const = 0;
-	virtual Result save(const void* pItem, ObjectWriteStream& writeStream) const = 0;
+	virtual Result<Success> load(void* pItem, ObjectReadStream& readStream) const = 0;
+	virtual Result<Success> save(const void* pItem, ObjectWriteStream& writeStream) const = 0;
 
 private:
 

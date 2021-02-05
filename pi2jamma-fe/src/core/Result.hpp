@@ -3,156 +3,153 @@
 #include "debug.hpp"
 #include <functional>
 #include <string>
+#include <variant>
 
+struct Success{};
+
+template<typename T>
 class Result final
 {
 public:
 
-	static Result makeSuccess();
+	using InfoFunction = std::function<const char*(std::string&)>;
+
+	Result(T&&);
+	Result(const T&);
+	Result(Result&&) = default;
+	Result(const Result&) = default;
+
+	Result(InfoFunction&& infoFunction);	
+
+	Result& operator=(const Result& result) = default;
+	Result& operator=(Result&& rhs) = default;	
+	
+	static Result makeSuccess(T&& t);
 	static Result makeFailureWithStringLiteral(const char* msg);
 	static Result makeFailureWithString(std::string msg);
 	static Result makeFailureNotImplemented();
 
-	Result(Result&& result);
 	~Result();
 
-	Result& operator=(const Result& result) = delete;
-	Result& operator=(Result&& rhs);
-
-	bool succeeded();
-	bool failed();
 	void catastrophic();
 
-	bool peekFailed();
-	bool peekSucceeded();
-
-	void ignore();
-
 	const char* getMessage();
+	const T& operator->();
+	const T& operator*();
+
+	T&& moveResult();
+
+	InfoFunction&& moveError();
+
+	explicit operator bool();
 
 private:
 
-	using InfoFunction = std::function<const char*(std::string&)>;
-
-	Result(bool success, InfoFunction&& infoFunction);
-
-	bool mSucceeded : 1;
-	bool mWasChecked : 1;
-
-	InfoFunction mInfoFunction;
+	std::variant<T, InfoFunction> m_variant;
 };
 
-inline Result Result::makeSuccess()
+template<typename T>
+inline Result<T> Result<T>::makeSuccess(T && t)
 {
 	return
-		Result(
-			true,
-			[](std::string& s) {
-				return "OK";
-			} );
+		Result(std::forward<T&&>(t));
 }
 
-inline Result Result::makeFailureWithStringLiteral(const char* msg)
+template<typename T>
+inline Result<T> Result<T>::makeFailureWithStringLiteral(const char* msg)
 {
 	return 
 		Result(
-			false, 
 			[msg](std::string& workArea) {
 				return msg;
 			} );
 }
 
-inline Result Result::makeFailureWithString(std::string msg)
+
+template<typename T>
+inline Result<T> Result<T>::makeFailureWithString(std::string msg)
 {
 	return
 		Result(
-			false,
 			[m = std::move(msg)](std::string& workArea) {
 				return m.c_str();
 			} );
 
 }
 
-inline Result Result::makeFailureNotImplemented()
+template<typename T>
+inline Result<T> Result<T>::makeFailureNotImplemented()
 {
 	return makeFailureWithStringLiteral("Not Implemented.");
 }
 
-inline Result::Result(Result&& rhs)
-	: mSucceeded(rhs.mSucceeded)
-	, mWasChecked(false)
-	, mInfoFunction(std::move(rhs.mInfoFunction))
+template<typename T>
+inline Result<T>::~Result()
 {
-	rhs.mWasChecked = true;
 }
 
-
-inline Result& Result::operator=(Result&& rhs)
+template<typename T>
+inline void Result<T>::catastrophic()
 {
-	ASSERT(mWasChecked);
-
-	mSucceeded = rhs.mSucceeded;
-	mWasChecked = false;
-	mInfoFunction = std::move(rhs.mInfoFunction);
-	rhs.mWasChecked = true;
-
-	return (*this);
+	ASSERTMSG(*this, getMessage());
 }
 
-inline Result::~Result()
+template<typename T>
+inline const char* Result<T>::getMessage()
 {
-	ASSERTMSG(mWasChecked, getMessage());
-}
-
-inline bool Result::succeeded()
-{
-	mWasChecked = true;
-	return mSucceeded;
-}
-
-inline bool Result::failed()
-{
-	mWasChecked = true;
-	return !mSucceeded;
-}
-
-inline bool Result::peekFailed()
-{
-	if(!mSucceeded)
+	if (std::holds_alternative<InfoFunction>(m_variant))
 	{
-		return true;
+		std::string workArea;
+		return std::get<InfoFunction>(m_variant)(workArea);
 	}
 
-	mWasChecked = true;
-
-	return false;
+	return "Success";
 }
 
-inline bool Result::peekSucceeded()
+template<typename T>
+const T& Result<T>::operator->()
 {
-	return mSucceeded;
+	return std::get<T>(m_variant);
 }
 
-inline void Result::ignore()
+template<typename T>
+const T& Result<T>::operator*()
 {
-	mWasChecked = true;
+	return std::get<T>(m_variant);
 }
 
-inline void Result::catastrophic()
+template<typename T>
+T&& Result<T>::moveResult()
 {
-	ASSERTMSG(succeeded(), getMessage());
+	return std::get<T>(m_variant);
 }
 
-inline const char* Result::getMessage()
+template<typename T>
+typename Result<T>::InfoFunction&& Result<T>::moveError()
 {
-	std::string workArea;
-	return mInfoFunction(workArea);
+	return std::move(std::get<InfoFunction>(m_variant));
 }
 
-inline Result::Result(bool success, InfoFunction&& infoFunction)
-	: mSucceeded(success)
-	, mWasChecked(false)
-	, mInfoFunction(std::move(infoFunction))
+template<typename T>
+inline Result<T>::Result(T&& t)
+	: m_variant{std::move(t)}
 {
+}
+template<typename T>
+inline Result<T>::Result(const T& t)
+	: m_variant{t}
+{
+}
 
+
+template<typename T>
+inline Result<T>::Result(InfoFunction&& infoFunction)
+	: m_variant(std::move(infoFunction))
+{
+}
+
+template<typename T>
+inline Result<T>::operator bool()
+{
+	return std::holds_alternative<T>(m_variant);
 }

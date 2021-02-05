@@ -2,14 +2,14 @@
 
 #include "core/meta/MetaSystem.hpp"
 
-Result metaSystemLoad(
+Result<Success> metaSystemLoad(
 	const std::type_info& typeInfo,
 	void* pObject,
 	ObjectReadStream& readStream)
 {
 	MetaType* pType = nullptr;
-	Result r = Meta::get().findType(pType,typeInfo);
-	if( r.peekFailed()) {
+	Result<Success> r = Meta::get().findType(pType,typeInfo);
+	if(!r) {
 		return r;
 	}
 
@@ -20,14 +20,14 @@ Result metaSystemLoad(
 	return pType->load(pObject, readStream);	
 }
 
-Result metaSystemSave(
+Result<Success> metaSystemSave(
 	const std::type_info& typeInfo,
 	const void* pObject,
 	ObjectWriteStream& writeStream)
 {
 	MetaType* pType = nullptr;
-	Result r = Meta::get().findType(pType,typeInfo);
-	if(r.peekFailed()) {
+	Result<Success> r = Meta::get().findType(pType,typeInfo);
+	if(!r) {
 		return r;
 	}
 	

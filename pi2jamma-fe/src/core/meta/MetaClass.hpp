@@ -8,7 +8,6 @@
 #define META_CLASS(C) \
 	static MetaClass<C> gMetaClass##C(#C)
 
-
 #define META_CLASS_FIELD(C, P) \
 	static MetaClassField<C,decltype(C::m##P)> gMetaClassField##C##P( \
 		Meta::get().findClass<C>(), \
@@ -47,8 +46,8 @@ public:
 		return mpPropertyType;
 	}
 
-	virtual Result load(void* pVoidObject, ObjectReadStream& readStream) const = 0;
-	virtual Result save(const void* pVoidObject, ObjectWriteStream& write) const = 0;
+	virtual Result<Success> load(void* pVoidObject, ObjectReadStream& readStream) const = 0;
+	virtual Result<Success> save(const void* pVoidObject, ObjectWriteStream& write) const = 0;
 
 private:
 
@@ -97,7 +96,7 @@ public:
 
 		}
 
-	virtual Result load(void* pVoidObject, ObjectReadStream& readStream) const override
+	virtual Result<Success> load(void* pVoidObject, ObjectReadStream& readStream) const override
 	{
 		ClassType* pObject = static_cast<ClassType*>(pVoidObject);
 
@@ -106,7 +105,7 @@ public:
 		return Serializer<PropertyType>::load(prop, readStream);
 	}
 
-	virtual Result save(const void* pVoidObject, ObjectWriteStream& writeStream) const override {
+	virtual Result<Success> save(const void* pVoidObject, ObjectWriteStream& writeStream) const override {
 		const ClassType* pObject = static_cast<const ClassType*>(pVoidObject);
 		const PropertyType& prop = pObject->*mMember;
 
@@ -141,22 +140,23 @@ public:
 		, mGetter(std::move(getter)) {
 	}
 
-	virtual Result load(void* pVoidObject, ObjectReadStream& readStream) const override
+	virtual Result<Success> load(void* pVoidObject, ObjectReadStream& readStream) const override
 	{
 		DecayType value;
 
-		Result result = Serializer<DecayType>::load(value, readStream);
-		if(result.peekFailed()) {
+		Result<Success> result = Serializer<DecayType>::load(value, readStream);
+		if(!result)
+		{
 			return result;
 		}
 
 		ClassType* pObject = static_cast<ClassType*>(pVoidObject);
 		(pObject->*mSetter)(std::move(value));
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 
-	virtual Result save(const void* pVoidObject, ObjectWriteStream& writeStream) const override {
+	virtual Result<Success> save(const void* pVoidObject, ObjectWriteStream& writeStream) const override {
 		const ClassType* pObject = static_cast<const ClassType*>(pVoidObject);		
 		return Serializer<DecayType>::save((pObject->*mGetter)(), writeStream);
 	}
@@ -188,9 +188,9 @@ public:
 		mPropertiesInDeclarationOrder.remove(metaClassProperty);
 	}
 
-	virtual Result load(void* pVoidObject, ObjectReadStream& readStream) const override;
+	virtual Result<Success> load(void* pVoidObject, ObjectReadStream& readStream) const override;
 
-	virtual Result save(const void* pVoidObject, ObjectWriteStream& writeStream) const override;
+	virtual Result<Success> save(const void* pVoidObject, ObjectWriteStream& writeStream) const override;
 
 
 private:

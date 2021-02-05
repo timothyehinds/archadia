@@ -21,7 +21,7 @@ public:
 	Meta();
 
 	MetaType* findType(const std::type_info& typeInfo);
-	Result findType(MetaType*& pMetaTypeOut, const std::type_info& typeInfo);
+	Result<Success> findType(MetaType*& pMetaTypeOut, const std::type_info& typeInfo);
 
 	MetaType* findType(CStrArg name);
 
@@ -31,17 +31,17 @@ public:
 	}
 
 	template<typename T>
-	Result findType(MetaType*& pMetaType) {
+	Result<Success> findType(MetaType*& pMetaType) {
 		(pMetaType) = findType<T>();
 		if(nullptr ==pMetaType) {
 			return
-				Result::makeFailureWithString(
+				Result<Success>::makeFailureWithString(
 					formatString(
 						"Type not registered with meta stystem: %x",
 						typeid(T).name()));
 		}
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 	MetaClassBase* findClass(CStrArg name) {
 		MetaType* pMetaType = findType(name);

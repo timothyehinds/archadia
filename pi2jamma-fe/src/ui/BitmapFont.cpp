@@ -32,8 +32,6 @@ ref<BitmapFont> BitmapFont::fromFont(
 		{
 			glyphHeight = std::max(glyphHeight, refSurface->getHeight());
 		}
-
-		r.ignore();
 	}
 
 	return make_ref<BitmapFont>(std::move(glyphArray), glyphHeight);

@@ -1,8 +1,16 @@
 #include "Pi2Jamma/screens/ScreenControllerStack.hpp"
 
+ScreenControllerStack::ScreenControllerStack(ref<ui::Element> refRootElement)
+    : m_refRootElement{std::move(refRootElement)}
+{
+}
+
+ref<ui::Element> ScreenControllerStack::getRootElement()
+{
+    return m_refRootElement;
+}
+
 void ScreenControllerStack::push(
-    ui::Element* pParent,
-    const ui::Rect& rect,
     std::unique_ptr<ScreenController>&& uptScreenController)
 {
     if (!(m_screenControllerVector.empty()))
@@ -10,12 +18,11 @@ void ScreenControllerStack::push(
         m_screenControllerVector.back()->deactivate();
     }
 
-    m_refActiveElement = uptScreenController->activate(pParent, rect);
-
+    m_refActiveElement = uptScreenController->activate(*this);
     m_screenControllerVector.push_back(std::move(uptScreenController));
 }
 
-void ScreenControllerStack::pop(ui::Element* pParent, const ui::Rect& rect)
+bool ScreenControllerStack::pop()
 {
     ASSERT(!(m_screenControllerVector.empty()));
 
@@ -25,10 +32,10 @@ void ScreenControllerStack::pop(ui::Element* pParent, const ui::Rect& rect)
 
     if (!(m_screenControllerVector.empty()))
     {
-        m_refActiveElement = m_screenControllerVector.back()->activate(pParent, rect);
+        m_refActiveElement = m_screenControllerVector.back()->activate(*this);
+        return true;
     }
-    else
-    {
-        m_refActiveElement = nullptr;
-    }
+
+    m_refActiveElement = nullptr;
+    return false;
 }

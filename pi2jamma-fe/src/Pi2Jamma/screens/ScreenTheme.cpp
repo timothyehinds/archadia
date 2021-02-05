@@ -1,20 +1,24 @@
 #include "Pi2Jamma/screens/ScreenTheme.hpp"
 
-#include "core/file/FilePath.hpp"
 #include "ui/Application.hpp"
+
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 ScreenTheme::ScreenTheme(
     ScreenThemeDescription themeDescription,
     const CStr fullThemeDir)
     : m_description{std::move(themeDescription)}
 {
-	Result result{
+	Result<ref<ui::Font>> resultFont{
         ui::Application::get().loadFont(
-			m_refFont,
 			m_description.getMenuTextSize(),
-			joinPath(fullThemeDir, m_description.getFontFilePath()))};
+			(fs::path(fullThemeDir.c_str()) / m_description.getFontFilePath().c_str()).c_str())};
 	
-	result.catastrophic();
+	resultFont.catastrophic();
+
+	m_refFont = *resultFont;
 	
 	m_refSelectedBitmapFont =
 		ui::BitmapFont::fromFont(
@@ -26,10 +30,11 @@ ScreenTheme::ScreenTheme(
 			m_refFont,
 			m_description.getMenuTextColor());  
 
-	result =
+	Result<ref<ui::Surface>> resultSurface{
 		ui::Application::get().loadSurface(
-			m_refBackgroundSurface,
-			joinPath(fullThemeDir, "background.png"));
+			(fs::path(fullThemeDir.c_str()) / "background.png").c_str())};
 	
-	result.catastrophic();
+	resultSurface.catastrophic();
+
+	m_refBackgroundSurface = *resultSurface;
 }

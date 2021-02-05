@@ -8,29 +8,29 @@ class ObjectWriteStream
 public:
 	virtual ~ObjectWriteStream() = default;
 
-	virtual Result writeNativeFloat(double flt) = 0;
-	virtual Result writeNativeInt(int64_t i) = 0;
-	virtual Result writeBoolean(bool b) = 0;
-	virtual Result writeCVariableName(StringSpan s) = 0;
-	virtual Result writeString(StringSpan s) = 0;
+	virtual Result<Success> writeNativeFloat(double flt) = 0;
+	virtual Result<Success> writeNativeInt(int64_t i) = 0;
+	virtual Result<Success> writeBoolean(bool b) = 0;
+	virtual Result<Success> writeCVariableName(StringSpan s) = 0;
+	virtual Result<Success> writeString(StringSpan s) = 0;
 
-	virtual Result beginObject() = 0;
-	virtual Result beginField(StringSpan s) = 0;
-	virtual Result endField() = 0;
-	virtual Result endObject() = 0;
+	virtual Result<Success> beginObject() = 0;
+	virtual Result<Success> beginField(StringSpan s) = 0;
+	virtual Result<Success> endField() = 0;
+	virtual Result<Success> endObject() = 0;
 
-	virtual Result beginArray() = 0;
-	virtual Result beginArrayItem() = 0;
-	virtual Result endArrayItem() = 0;
-	virtual Result endArray() = 0;
+	virtual Result<Success> beginArray() = 0;
+	virtual Result<Success> beginArrayItem() = 0;
+	virtual Result<Success> endArrayItem() = 0;
+	virtual Result<Success> endArray() = 0;
 	
 	template<typename T>
-	Result writeFloat(T t) {
+	Result<Success> writeFloat(T t) {
 		return writeNativeFloat(static_cast<double>(t));
 	}
 
 	template<typename T>
-	Result writeInteger(T t) {
+	Result<Success> writeInteger(T t) {
 		return writeNativeInt(static_cast<uint64_t>(t));
 	}
 };

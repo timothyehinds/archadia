@@ -9,25 +9,25 @@ class JsonWriteStream : public ObjectWriteStream
 public:
 	JsonWriteStream(StreamType stream);
 
-	virtual Result writeNativeFloat(double flt) override;
-	virtual Result writeNativeInt(int64_t i) override;
-	virtual Result writeBoolean(bool b) override;
-	virtual Result writeCVariableName(StringSpan s) override;
-	virtual Result writeString(StringSpan s) override;
+	virtual Result<Success> writeNativeFloat(double flt) override;
+	virtual Result<Success> writeNativeInt(int64_t i) override;
+	virtual Result<Success> writeBoolean(bool b) override;
+	virtual Result<Success> writeCVariableName(StringSpan s) override;
+	virtual Result<Success> writeString(StringSpan s) override;
 
-	virtual Result beginObject() override;
-	virtual Result beginField(StringSpan s) override;
-	virtual Result endField() override;
-	virtual Result endObject() override;
-	virtual Result beginArray() override;
-	virtual Result beginArrayItem() override;
-	virtual Result endArrayItem() override;
-	virtual Result endArray() override;
+	virtual Result<Success> beginObject() override;
+	virtual Result<Success> beginField(StringSpan s) override;
+	virtual Result<Success> endField() override;
+	virtual Result<Success> endObject() override;
+	virtual Result<Success> beginArray() override;
+	virtual Result<Success> beginArrayItem() override;
+	virtual Result<Success> endArrayItem() override;
+	virtual Result<Success> endArray() override;
 private:
 
-	Result write(StringSpan s);
-	Result write(char c);
-	Result writeIndent();
+	Result<Success> write(StringSpan s);
+	Result<Success> write(char c);
+	Result<Success> writeIndent();
 
 	StreamType mStream;
 
@@ -57,7 +57,7 @@ JsonWriteStream<StreamType>::JsonWriteStream(StreamType stream)
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::writeNativeFloat(double flt)
+Result<Success> JsonWriteStream<StreamType>::writeNativeFloat(double flt)
 {
 	char s[256];
 	auto numChars = sprintf(s, "%f", flt);
@@ -65,7 +65,7 @@ Result JsonWriteStream<StreamType>::writeNativeFloat(double flt)
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::writeNativeInt(int64_t i)
+Result<Success> JsonWriteStream<StreamType>::writeNativeInt(int64_t i)
 {
 	char s[256];
 	auto numChars = sprintf(s, "%d", (int) i );
@@ -73,7 +73,7 @@ Result JsonWriteStream<StreamType>::writeNativeInt(int64_t i)
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::writeBoolean(bool b)
+Result<Success> JsonWriteStream<StreamType>::writeBoolean(bool b)
 {
 	const char* pStr = b ? "true" : "false";
 
@@ -81,23 +81,23 @@ Result JsonWriteStream<StreamType>::writeBoolean(bool b)
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::writeCVariableName(StringSpan s)
+Result<Success> JsonWriteStream<StreamType>::writeCVariableName(StringSpan s)
 {
 	return writeString(s);
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::writeString(StringSpan s)
+Result<Success> JsonWriteStream<StreamType>::writeString(StringSpan s)
 {
 	OmStringEscape(mWorkArea, s, OM_STRING_C_ESCAPE_ITEMS );
 
-	Result r = write('\"');
-	if(r.peekFailed()) {
+	Result<Success> r = write('\"');
+	if(!r) {
 		return r;
 	}
 
 	r = mStream.write(mWorkArea.c_str(), mWorkArea.size());
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
@@ -105,7 +105,7 @@ Result JsonWriteStream<StreamType>::writeString(StringSpan s)
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::beginObject()
+Result<Success> JsonWriteStream<StreamType>::beginObject()
 {
 	mStack.push(StackFrame(StackFrame::Type::Object));
 
@@ -113,7 +113,7 @@ Result JsonWriteStream<StreamType>::beginObject()
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::beginField(StringSpan name)
+Result<Success> JsonWriteStream<StreamType>::beginField(StringSpan name)
 {
 	static StringSpan sColon(" : ");
 
@@ -121,40 +121,40 @@ Result JsonWriteStream<StreamType>::beginField(StringSpan name)
 	StackFrame& stackFrame = mStack.top();
 	ASSERT(StackFrame::Type::Object == stackFrame.mType);
 	if(stackFrame.mItemCount > 0) {
-		Result r = write(',');
-		if(r.peekFailed()) {
+		Result<Success> r = write(',');
+		if(!r) {
 			return r;
 		}
 	}
 
-	Result r = write('\n');
-	if(r.peekFailed()) {
+	Result<Success> r = write('\n');
+	if(!r) {
 		return r;
 	}
 
 	r = writeIndent();
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
 	r = writeString(name);
 
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
 	r = write(sColon);
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
 	stackFrame.mItemCount++;
 	stackFrame.mInItem = true;
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::endField()
+Result<Success> JsonWriteStream<StreamType>::endField()
 {
 	ASSERT(mStack.size() > 0);
 	StackFrame& stackFrame = mStack.top();
@@ -162,11 +162,11 @@ Result JsonWriteStream<StreamType>::endField()
 	ASSERT(stackFrame.mItemCount > 0);
 	ASSERT(stackFrame.mInItem);
 	stackFrame.mInItem = false;
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::endObject()
+Result<Success> JsonWriteStream<StreamType>::endObject()
 {
 	ASSERT(mStack.size() > 0);
 	StackFrame& stackFrame = mStack.top();
@@ -174,20 +174,20 @@ Result JsonWriteStream<StreamType>::endObject()
 	ASSERT(stackFrame.mInItem == false);
 	mStack.pop();
 	
-	Result r = write('\n');
-	if(r.peekFailed()) {
+	Result<Success> r = write('\n');
+	if(!r) {
 		return r;
 	}
 
 	r = writeIndent();
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 	return write('}');
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::beginArray()
+Result<Success> JsonWriteStream<StreamType>::beginArray()
 {
 	mStack.push(StackFrame(StackFrame::Type::Array));
 	return write('[');
@@ -195,7 +195,7 @@ Result JsonWriteStream<StreamType>::beginArray()
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::beginArrayItem()
+Result<Success> JsonWriteStream<StreamType>::beginArrayItem()
 {
 	ASSERT(mStack.size() > 0);
 	StackFrame& stackFrame = mStack.top();
@@ -204,27 +204,27 @@ Result JsonWriteStream<StreamType>::beginArrayItem()
 	stackFrame.mInItem = true;
 
 	if(stackFrame.mItemCount > 0) {
-		Result r = write(',');
-		if(r.peekFailed()) {
+		Result<Success> r = write(',');
+		if(!r) {
 			return r;
 		}
 	}
 
-	Result r = write('\n');
-	if(r.peekFailed()) {
+	Result<Success> r = write('\n');
+	if(!r) {
 		return r;
 	}
 
 	r = writeIndent();
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::endArrayItem()
+Result<Success> JsonWriteStream<StreamType>::endArrayItem()
 {
 	ASSERT(mStack.size() > 0);
 	StackFrame& stackFrame = mStack.top();
@@ -234,11 +234,11 @@ Result JsonWriteStream<StreamType>::endArrayItem()
 	stackFrame.mInItem = false;
 	stackFrame.mItemCount++;
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 template<typename StreamType>
-Result JsonWriteStream<StreamType>::endArray()
+Result<Success> JsonWriteStream<StreamType>::endArray()
 {
 	ASSERT(mStack.size() > 0);
 	StackFrame& stackFrame = mStack.top();
@@ -251,28 +251,28 @@ Result JsonWriteStream<StreamType>::endArray()
 }
 
 template<typename StreamType>
-inline Result JsonWriteStream<StreamType>::write(StringSpan s)
+inline Result<Success> JsonWriteStream<StreamType>::write(StringSpan s)
 {
 	return mStream.write(s.begin(), s.size());
 }
 
 template<typename StreamType>
-inline Result JsonWriteStream<StreamType>::write(char c)
+inline Result<Success> JsonWriteStream<StreamType>::write(char c)
 {
 	return mStream.write(& c, 1);
 }
 
 template<typename StreamType>
-inline Result JsonWriteStream<StreamType>::writeIndent()
+inline Result<Success> JsonWriteStream<StreamType>::writeIndent()
 {
 	static StringSpan indent("    ");
 
 	for(unsigned int i = 0; i < mStack.size(); i ++ ) {
-		Result r = write(indent);
-		if(r.peekFailed()) {
+		Result<Success> r = write(indent);
+		if(!r) {
 			return r;
 		}
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }

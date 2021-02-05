@@ -4,7 +4,6 @@
 #include "Pi2Jamma/screens/ScreenTheme.hpp"
 #include "Pi2Jamma/screens/SettingsScreenController.hpp"
 
-#include "core/file/FilePath.hpp"
 #include "core/meta/Meta.hpp"
 #include "core/json/JsonParser.hpp"
 #include "core/serialize/json/JsonSerialize.hpp"
@@ -12,45 +11,49 @@
 #include "ui/ui.hpp"
 #include "ui/Point.hpp"
 
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 Pi2JammaApplication::Pi2JammaApplication()
-	: mDataDir("./data")
+	: m_dataPath("./data")
 {
 }
 
-Result Pi2JammaApplication::initialize(int argc, const char* argv[])
+Result<Success> Pi2JammaApplication::initialize(int argc, const char* argv[])
 {
 	Meta::initialize();
 	ui::initialize();
 
 	Configuration::initialize();
 	ScreenThemeDescription::initialize();
-	//Game::initialize();
-	//Games::initialize();
 
 	Result result = CommandLine::get().parse(argc, argv);
-	if(result.peekFailed()) {
+	if(!result) {
 		return result;
 	}
 
 	result = loadConfiguration();
-	if(result.peekFailed()) {
+	if(!result) {
 		return result;
 	}
 
 	return setupUi();
 }
 
-Result Pi2JammaApplication::loadConfiguration()
+Result<Success> Pi2JammaApplication::loadConfiguration()
 {
-	Result result = loadJson(
+	Result<Success> result = loadJson(
 		mConfiguration,
 		CommandLineHandlerConfigFile::sSingleton.mConfigFile);
 
-	if(result.peekFailed()) {
+	if(!result)
+	{
 		return result;
 	}
 
-	std::string themesDir = joinPath(mDataDir, "themes");
+	const fs::path themesDir = m_dataPath / "themes";
+
 	const UiConfiguration& uiConfig = mConfiguration.getUi();
 
 	bool portrait =
@@ -59,36 +62,21 @@ Result Pi2JammaApplication::loadConfiguration()
 	CStr orientationDir =
 		portrait
 			? "portrait"
-			: "landsape";
+			: "landscape";
 
 	CStr themeDir =
 		portrait
 			? uiConfig.getPortraitTheme()
 			: uiConfig.getLandscapeTheme();
 
-	mSnapsDir = joinPath(mDataDir, "snaps", orientationDir);			
-
 	// Load theme
 
-	m_fullThemeDir =
-		joinPath(themesDir, orientationDir, themeDir);
+	m_fullThemePath = themesDir / orientationDir.c_str() / themeDir.c_str();
 
-#if 0
-	// Load Games
-
-	std::string gamesPath = joinPath(mDataDir, "games.txt");
-
-	result = loadJson(mGames, gamesPath);
-	if(result.peekFailed()) {
-		return result;
-	}
-	#endif
-
-
-
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
-Result Pi2JammaApplication::setupUi()
+
+Result<Success> Pi2JammaApplication::setupUi()
 {
 	ui::Rect screenRect(
 		ui::Point(0, 0),
@@ -99,50 +87,39 @@ Result Pi2JammaApplication::setupUi()
 			nullptr,
 			screenRect);
 
-	loadJson(m_screenThemeDescription, joinPath(m_fullThemeDir, "config.txt")).catastrophic();
+	m_uptScreenControllerStack =
+		std::make_unique<ScreenControllerStack>(m_refRootElement.get());
+
+	loadJson(m_screenThemeDescription, (m_fullThemePath / "config.txt").c_str()).catastrophic();
 
 	ref<ScreenTheme> refScreenTheme{
 		make_ref<ScreenTheme>(
 			m_screenThemeDescription,
-			m_fullThemeDir.c_str())};
+			m_fullThemePath.c_str())};
 
 	std::unique_ptr<SettingsScreenController> uptSettingsScreenController{
 		std::make_unique<SettingsScreenController>(refScreenTheme)};
 
-	m_screenControllerStack.push(
-		m_refRootElement.get(),
-		m_refRootElement->getRect(),
+	m_uptScreenControllerStack->push(
 		std::move(uptSettingsScreenController));
 
-	/*mrefGameSelectScreen =
-		make_ref<GameSelectScreen>(
-			m_refRootElement.get(),
-			screenRect,
-			*this,
-			mGames,
-			m_fullThemeDir,
-			mSnapsDir); */
-
-		
-
-	ref<ui::Font> refConsoleFont;
-	Result r = loadFont(
-		refConsoleFont,
+	Result<ref<ui::Font>> resultFont = loadFont(
 		16,
-		joinPath(mDataDir, "vgafix.fon"));
+		(m_dataPath / "vgafix.fon").c_str());
 
-	if(r.peekFailed()) {
-		return r;
+	if(!resultFont)
+	{
+		return Result<Success>{resultFont.moveError()};
 	}
 
 	mrefConsole = make_ref<ui::Console>(
 		m_refRootElement.get(),
 		screenRect,
 		ui::BitmapFont::fromFont(
-			refConsoleFont,
+			*resultFont,
 			ui::Color(0xFF, 0xFF, 0xFF)));
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 void Pi2JammaApplication::render(ui::RenderContext& renderContext)
@@ -152,10 +129,12 @@ void Pi2JammaApplication::render(ui::RenderContext& renderContext)
 
 void Pi2JammaApplication::keyDownEvent(const ui::KeyDownEvent& keyDownEvent)
 {
-
 	if(keyDownEvent.getKey() == ui::Key::Escape)
 	{
-		quit();
+		if (!m_uptScreenControllerStack->pop())
+		{
+			quit();
+		}
 	}
 
 	ui::InputEvent inputEvent;
@@ -174,3 +153,4 @@ void Pi2JammaApplication::keyDownEvent(const ui::KeyDownEvent& keyDownEvent)
 
 	m_refRootElement->inputEvent(inputEvent);
 }
+

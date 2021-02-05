@@ -5,4 +5,4 @@
 
 #include <vector>
 
-Result readFile(CStr filename, std::vector<char>& data);
+Result<Success> readFile(CStr filename, std::vector<char>& data);

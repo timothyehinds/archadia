@@ -11,7 +11,7 @@ public:
 	CommandLineHandler(CStr shortName, CStr longName);
 	~CommandLineHandler();
 
-	virtual Result parse(const char**& ppToken, const char** ppEnd) = 0;
+	virtual Result<Success> parse(const char**& ppToken, const char** ppEnd) = 0;
 	virtual CStr getHelp() const = 0;
 
 	PROPERTY(CStr, ShortName);

@@ -53,34 +53,34 @@ void initialize() {
 }
 
 template<typename T >
-static Result parseHex(T& t, StringSpan s) {
+static Result<Success> parseHex(T& t, StringSpan s) {
 	t = static_cast<T>(0);
 	for( auto&& c : s ) {
 		T hexValue = 0;
 		bool ok = OmCharToHexValue(c, &hexValue);
 		if(!ok) {
-			return Result::makeFailureWithString(formatString("%c is not a valid hex value.", c));
+			return Result<Success>::makeFailureWithString(formatString("%c is not a valid hex value.", c));
 		}
 
 		t = t << 4;
 		t += hexValue;
  	}
 
- 	return Result::makeSuccess();
+ 	return Result{Success{}};
 }
 
-Result parseColor(Color& color, StringSpan stringSpan)
+Result<Success> parseColor(Color& color, StringSpan stringSpan)
 {
 	if(stringSpan.size() < 0) {
-		return Result::makeFailureWithStringLiteral("Empty String.");
+		return Result<Success>::makeFailureWithStringLiteral("Empty String.");
 	}
 
 	if('#' != stringSpan[0]) {
-		return Result::makeFailureWithStringLiteral("Expected color string to start with '#");
+		return Result<Success>::makeFailureWithStringLiteral("Expected color string to start with '#");
 	}
 
 	if(! oneOf<size_t>(stringSpan.size(), {7, 9})) {
-		return Result::makeFailureWithStringLiteral("Weird number of characters in hext color string.");
+		return Result<Success>::makeFailureWithStringLiteral("Weird number of characters in hext color string.");
 	}
 
 	auto iter = stringSpan.begin();
@@ -93,7 +93,7 @@ Result parseColor(Color& color, StringSpan stringSpan)
 
 	while(iter < end) {
 		Result r = parseHex(mComponents[i], StringSpan(iter, iter + 2));
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 		iter += 2;
@@ -102,16 +102,16 @@ Result parseColor(Color& color, StringSpan stringSpan)
 
 	color = Color(mComponents);
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 } // namespace ui
 
-Result Serializer<ui::Color>::load(ui::Color& color, ObjectReadStream& readStream)
+Result<Success> Serializer<ui::Color>::load(ui::Color& color, ObjectReadStream& readStream)
 {
 	bool isObject = false;
-	Result r = readStream.peekObject(isObject);
-	if(r.peekFailed()) {
+	Result<Success> r = readStream.peekObject(isObject);
+	if(!r) {
 		return r;
 	}
 
@@ -121,23 +121,23 @@ Result Serializer<ui::Color>::load(ui::Color& color, ObjectReadStream& readStrea
 
 	bool isString = false;
 	r = readStream.peekString(isString);
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 
 	if(isString) {
 		std::string str;
 		r = readStream.readString(str);
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 		return ui::parseColor(color, str);
 	}
 
-	return Result::makeFailureWithStringLiteral("Bad color object.");
+	return Result<Success>::makeFailureWithStringLiteral("Bad color object.");
 }
 
-Result Serializer<ui::Color>::save(const ui::Color& color, ObjectWriteStream& writeStream)
+Result<Success> Serializer<ui::Color>::save(const ui::Color& color, ObjectWriteStream& writeStream)
 {
 	return Meta::get().findType<ui::Color>()->save(&color, writeStream);
 }

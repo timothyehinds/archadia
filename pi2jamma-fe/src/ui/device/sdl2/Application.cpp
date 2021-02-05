@@ -23,24 +23,24 @@ Application::~Application()
 	spSingleton = nullptr;
 }
 
-Result Application::run(int argc, const char* argv[])
+Result<Success> Application::run(int argc, const char* argv[])
 {
 	int sdlInitResult = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
 	if(0 != sdlInitResult) {
-		return Result::makeFailureWithString(SDL_GetError());
+		return Result<Success>::makeFailureWithString(SDL_GetError());
 	}
 
 	int imgInitFlags = IMG_INIT_PNG;
 	int imgInitResult = IMG_Init(imgInitFlags);
 
 	if(imgInitFlags != imgInitResult) {
-		return Result::makeFailureWithString(IMG_GetError());
+		return Result<Success>::makeFailureWithString(IMG_GetError());
 	}
 
 	int ttfInitResult = TTF_Init();
 	if(0 != ttfInitResult) {
-		return Result::makeFailureWithString(TTF_GetError());
+		return Result<Success>::makeFailureWithString(TTF_GetError());
 	}
 
 	muptSdlWindow.reset(
@@ -53,7 +53,7 @@ Result Application::run(int argc, const char* argv[])
 			SDL_WINDOW_SHOWN));
 
 	if(!muptSdlWindow) {
-		return Result::makeFailureWithString(SDL_GetError());
+		return Result<Success>::makeFailureWithString(SDL_GetError());
 	}
 
 	muptSdlRenderer.reset(
@@ -63,7 +63,7 @@ Result Application::run(int argc, const char* argv[])
 
 	if(!muptSdlRenderer)
 	{
-		return Result::makeFailureWithString(SDL_GetError());
+		return Result<Success>::makeFailureWithString(SDL_GetError());
 	}
 	
 	m_uptUnRotatedTexture.reset(
@@ -86,15 +86,15 @@ Result Application::run(int argc, const char* argv[])
 
 	ASSERT(m_uptRotatedTexture);
 
-	Result result = initialize(argc, argv);
-	if (result.peekFailed()) {
+	Result<Success> result = initialize(argc, argv);
+	if (!result) {
 		return result;
 	}
 
 	return renderLoop();
 }
 
-Result Application::renderLoop()
+Result<Success> Application::renderLoop()
 {
 	SDL_Event sdlEvent = {};
 
@@ -137,11 +137,10 @@ Result Application::renderLoop()
 		SDL_Delay(60);
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
-Result Application::loadSurface(
-	ref<Surface>& refSurface,
+Result<ref<Surface>> Application::loadSurface(
 	CStr filePath)
 {
 	std::unique_ptr<SDL_Texture> uptSdlTexture(
@@ -151,16 +150,15 @@ Result Application::loadSurface(
 
 	if(!uptSdlTexture) {
 		LogFmt( "Failed to load texture: %s\n", filePath.c_str());		
-		return Result::makeFailureWithString(IMG_GetError());
+		return Result<ref<Surface>>::makeFailureWithString(IMG_GetError());
 	}
 
-	refSurface = make_ref<Surface>(std::move(uptSdlTexture));
+	ref<Surface> refSurface = make_ref<Surface>(std::move(uptSdlTexture));
 
-	return Result::makeSuccess();
+	return Result{std::move(refSurface)};
 }
 
-Result Application::loadFont(
-	ref<Font>& refFont,
+Result<ref<Font>> Application::loadFont(
 	UnitType sizePx,
 	CStr fileName)
 {
@@ -168,15 +166,15 @@ Result Application::loadFont(
 		TTF_OpenFont(fileName.c_str(), sizePx));
 
 	if(!uptSdlFont) {
-		return Result::makeFailureWithString(TTF_GetError());
+		return Result<ref<Font>>::makeFailureWithString(TTF_GetError());
 	}
 
-	refFont = make_ref<Font>(std::move(uptSdlFont));
+	ref<Font> refFont = make_ref<Font>(std::move(uptSdlFont));
 
-	return Result::makeSuccess();
+	return Result{std::move(refFont)};
 }
 
-Result Application::renderText(
+Result<Success> Application::renderText(
 	ref<Surface>& refSurface,
 	const ref<Font>& refFont,
 	const Color& color,
@@ -189,7 +187,7 @@ Result Application::renderText(
 			color.mSdlColor));
 
 	if(!uptSdlSurface) {
-		return Result::makeFailureWithString(TTF_GetError());
+		return Result<Success>::makeFailureWithString(TTF_GetError());
 	}
 
 	std::unique_ptr<SDL_Texture> uptSdlTexture(
@@ -198,12 +196,12 @@ Result Application::renderText(
 			uptSdlSurface.get()));
 
 	if(!uptSdlTexture) {
-		return Result::makeFailureWithString(SDL_GetError());
+		return Result<Success>::makeFailureWithString(SDL_GetError());
 	}
 
 	refSurface = make_ref<Surface>(std::move(uptSdlTexture));
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 void Application::dispatchEvent(const SDL_Event& sdlEvent)

@@ -13,7 +13,8 @@ File::~File()
 	close();
 }
 
-Result File::open(CStr filePath, OpenMode openMode) {
+Result<Success> File::open(const CStr filePath, const OpenMode openMode)
+{
 	close();
 
 	const char* pMode =
@@ -31,15 +32,15 @@ Result File::open(CStr filePath, OpenMode openMode) {
 		std::stringstream ss;
 		ss << "Failed to open file:'" << filePath.c_str() <<"', Mode:'" << pMode << "'.";
 
-		return Result::makeFailureWithString(ss.str());
+		return Result<Success>::makeFailureWithString(ss.str());
 
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 
 }
 
-Result File::readExactly(void* pBuf, FileSize bytes)
+Result<Success> File::readExactly(void* pBuf, FileSize bytes)
 {
 	auto result = fread(pBuf, 1, bytes, mpFile);
 	if(result != bytes) {
@@ -50,37 +51,35 @@ Result File::readExactly(void* pBuf, FileSize bytes)
 			<< " got: "
 			<< result;
 
-		return Result::makeFailureWithString(ss.str());
+		return Result<Success>::makeFailureWithString(ss.str());
 	}
 
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
-Result File::getSize(FileSize& size)
+Result<FileSize> File::getSize()
 {
 	auto originalPositionOrError = ftell(mpFile);
 	
 	if(-1L == originalPositionOrError) {
-		return Result::makeFailureWithStringLiteral("ftell() failed");
+		return Result<FileSize>::makeFailureWithStringLiteral("ftell() failed");
 	}
 
 	if( 0 != fseek(mpFile, 0, SEEK_END)) {
-		return Result::makeFailureWithStringLiteral("fseek() failed.");
+		return Result<FileSize>::makeFailureWithStringLiteral("fseek() failed.");
 	}
 
 	auto endPositionOrError = ftell(mpFile);
 
 	if(-1L == endPositionOrError) {
-		return Result::makeFailureWithStringLiteral("ftell() failed");
+		return Result<FileSize>::makeFailureWithStringLiteral("ftell() failed");
 	}	
 
 	if(0 !=fseek(mpFile, 0, originalPositionOrError)) {
-		return Result::makeFailureWithStringLiteral("fseek() failed.");
+		return Result<FileSize>::makeFailureWithStringLiteral("fseek() failed.");
 	}
 
-	size = endPositionOrError;
-
-	return Result::makeSuccess();
+	return Result<FileSize>{static_cast<FileSize>(endPositionOrError)};
 }
 
 void File::close()

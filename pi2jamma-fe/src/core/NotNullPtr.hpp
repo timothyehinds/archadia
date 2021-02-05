@@ -13,6 +13,11 @@ public:
     {
         return *m_pT;
     }
+
+    operator T*() const
+    {
+        return m_pT;
+    }
 private:
     T* m_pT;
 };

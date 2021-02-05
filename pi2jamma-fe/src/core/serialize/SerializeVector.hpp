@@ -7,19 +7,19 @@
 template<typename ElementType>
 struct Serializer<std::vector<ElementType>>
 {
-	static Result load(
+	static Result<Success> load(
 		std::vector<ElementType>& v,
 		ObjectReadStream& readStream)
 	{
-		Result r = readStream.beginArray();
-		if(r.peekFailed()) {
+		Result<Success> r = readStream.beginArray();
+		if(!r) {
 			return r;
 		}
 		while(true)
 		{
 			bool moreElements = false;
 			r = readStream.nextArrayItem(moreElements);
-			if(r.peekFailed()) {
+			if(!r) {
 				return r;
 			}
 
@@ -30,7 +30,7 @@ struct Serializer<std::vector<ElementType>>
 			ElementType e;
 
 			r = ::load(e, readStream);
-			if(r.peekFailed()) {
+			if(!r) {
 				return r;
 			}
 
@@ -38,41 +38,41 @@ struct Serializer<std::vector<ElementType>>
 		}
 
 		r = readStream.endArray();
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}
 
-	static Result save(
+	static Result<Success> save(
 		const std::vector<ElementType>& v,
 		ObjectWriteStream& writeStream)
 	{
-		Result r = writeStream.beginArray();
-		if(r.peekFailed()) {
+		Result<Success> r = writeStream.beginArray();
+		if(!r) {
 			return r;
 		}
 
 		for(auto&& e: v) {
 			r = writeStream.beginArrayItem();
-			if(r.peekFailed()) {
+			if(!r) {
 				return r;
 			}
 			r = ::save(e, writeStream);
-			if(r.peekFailed()) {
+			if(!r) {
 				return r;
 			}
 			r = writeStream.endArrayItem();
-			if(r.peekFailed()){
+			if(!r){
 				return r;
 			}
 		}
 		r = writeStream.endArray();
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 
-		return Result::makeSuccess();
+		return Result{Success{}};
 	}		
 };

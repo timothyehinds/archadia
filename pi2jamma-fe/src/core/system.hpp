@@ -6,5 +6,5 @@ class System
 {
 	public:
 
-	 	[[nodiscard]] static Result exec(const char* cmd, std::string& output);
+	 	[[nodiscard]] static Result<Success> exec(const char* cmd, std::string& output);
 };

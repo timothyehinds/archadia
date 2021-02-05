@@ -17,39 +17,39 @@ public:
 		: mParser(std::move(parser))
 	{}
 
-	virtual Result readNativeInteger(int64_t& integer) override;
-	virtual Result readNativeFloat(double& flt) override
+	virtual Result<Success> readNativeInteger(int64_t& integer) override;
+	virtual Result<Success> readNativeFloat(double& flt) override
 	{
-		return Result::makeFailureWithStringLiteral("readFloat not implemented.");
+		return Result<Success>::makeFailureWithStringLiteral("readFloat not implemented.");
 	}
 
-	virtual Result readString(std::string& str) override;
-    virtual Result peekString(bool& isString) override;
+	virtual Result<Success> readString(std::string& str) override;
+    virtual Result<Success> peekString(bool& isString) override;
 
-	virtual Result readBoolean(bool& boolean) override;
+	virtual Result<Success> readBoolean(bool& boolean) override;
 
-	virtual Result readCVariableName(std::string& str) override
+	virtual Result<Success> readCVariableName(std::string& str) override
 	{
 		return readString(str);	
 	}
 
-	virtual Result beginArray() override;
-	virtual Result nextArrayItem(bool& hasItem) override;
-    virtual Result endArray() override;
+	virtual Result<Success> beginArray() override;
+	virtual Result<Success> nextArrayItem(bool& hasItem) override;
+    virtual Result<Success> endArray() override;
     
-	virtual Result peekObject(bool& isObject) override;
-	virtual Result beginObject() override;
-	virtual Result beginField(bool& done, std::string& name) override;
-	virtual Result endField() override;
-	virtual Result endObject() override;
+	virtual Result<Success> peekObject(bool& isObject) override;
+	virtual Result<Success> beginObject() override;
+	virtual Result<Success> beginField(bool& done, std::string& name) override;
+	virtual Result<Success> endField() override;
+	virtual Result<Success> endObject() override;
 
-    virtual Result makeError(CStr message) override;
+    virtual Result<Success> makeError(CStr message) override;
 
 private:
 	
-	Result parseUnicodeSequence(CharType* pRes);
+	Result<Success> parseUnicodeSequence(CharType* pRes);
 
-	Result makeEofError();
+	Result<Success> makeEofError();
 
     struct StackFrame {
 
@@ -72,7 +72,7 @@ private:
 };
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::readNativeInteger(int64_t& integer)
+Result<Success> JsonReadStream<ParserType>::readNativeInteger(int64_t& integer)
 {
     integer = 0;
 
@@ -97,7 +97,7 @@ Result JsonReadStream<ParserType>::readNativeInteger(int64_t& integer)
 
     if(!OmCharIsNumber(c)) {
         return
-            Result::makeFailureWithString(
+            Result<Success>::makeFailureWithString(
                 formatString(
                     "Expected decimal digit, not '%c'", c));
     }
@@ -125,20 +125,20 @@ Result JsonReadStream<ParserType>::readNativeInteger(int64_t& integer)
 
     // LogFmt("Integer! %d\n", (int) integer);
 
-    return Result::makeSuccess();    
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::peekString(bool& isString)
+Result<Success> JsonReadStream<ParserType>::peekString(bool& isString)
 {
     CharType c;
     isString = (mParser.Peek(&c) && ('\"' == c));
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 
 template< typename ParserType >
-Result JsonReadStream< ParserType >::readString( std::string& s )
+Result<Success> JsonReadStream< ParserType >::readString( std::string& s )
 {
 	OmParseEatWhite(&mParser);
 	CharType c;
@@ -182,8 +182,8 @@ Result JsonReadStream< ParserType >::readString( std::string& s )
                 {
                     mParser.Next();
                 
-                    Result r = parseUnicodeSequence( & c );
-                    if(r.peekFailed()) {
+                    Result<Success> r = parseUnicodeSequence( & c );
+                    if(!r) {
                     	return r;
                     }
                     s += c;
@@ -216,11 +216,11 @@ Result JsonReadStream< ParserType >::readString( std::string& s )
     
     // LogFmt("Read string: %s\n", s.c_str());
 
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::beginArray()
+Result<Success> JsonReadStream<ParserType>::beginArray()
 {
     OmParseEatWhite(&mParser);
     CharType c;
@@ -233,11 +233,11 @@ Result JsonReadStream<ParserType>::beginArray()
     }
 
     mStack.push(StackFrame(StackFrame::Type::Array));
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::nextArrayItem(bool& hasItem)
+Result<Success> JsonReadStream<ParserType>::nextArrayItem(bool& hasItem)
 {
     OM_ASSERT(mStack.size() > 0);
     StackFrame& stackFrame = mStack.top();
@@ -253,7 +253,7 @@ Result JsonReadStream<ParserType>::nextArrayItem(bool& hasItem)
 
     if(stackFrame.mItemCount > 0) {
         if(c != ',') {
-            return Result::makeSuccess();
+            return Result{Success{}};
         }
         if (!mParser.Next(&c)) {
             return makeEofError();
@@ -263,11 +263,11 @@ Result JsonReadStream<ParserType>::nextArrayItem(bool& hasItem)
     hasItem = true;
     stackFrame.mItemCount++;
 
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::endArray()
+Result<Success> JsonReadStream<ParserType>::endArray()
 {
     ASSERT(mStack.size() > 0);
     StackFrame& stackFrame = mStack.top();
@@ -290,11 +290,11 @@ Result JsonReadStream<ParserType>::endArray()
 
     mStack.pop();
 
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::peekObject(bool& isObject)
+Result<Success> JsonReadStream<ParserType>::peekObject(bool& isObject)
 {
     OmParseEatWhite(&mParser);
 
@@ -303,16 +303,16 @@ Result JsonReadStream<ParserType>::peekObject(bool& isObject)
     if (!mParser.Peek(&c) || (c != '{'))
     {
         isObject = false;
-        return Result::makeSuccess();
+        return Result{Success{}};
     }
 
     isObject = true;
 
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::beginObject()
+Result<Success> JsonReadStream<ParserType>::beginObject()
 {
 	OmParseEatWhite(&mParser);
 
@@ -332,11 +332,11 @@ Result JsonReadStream<ParserType>::beginObject()
 
     //Log("StackFrame!\n");
     
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::endObject()
+Result<Success> JsonReadStream<ParserType>::endObject()
 {
     ASSERT(mStack.size() > 0);
     mStack.pop();
@@ -354,11 +354,11 @@ Result JsonReadStream<ParserType>::endObject()
                 c));
     }
 
-    return Result::makeSuccess();
+    return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::beginField(bool& gotField, std::string& name)
+Result<Success> JsonReadStream<ParserType>::beginField(bool& gotField, std::string& name)
 {
     ASSERT(mStack.size() > 0);
     StackFrame& stackFrame = mStack.top(); 
@@ -380,7 +380,7 @@ Result JsonReadStream<ParserType>::beginField(bool& gotField, std::string& name)
         // LogFmt("FieldCount > 0, char: %c\n", c);
 
         if(c != ',') {
-            return Result::makeSuccess();
+            return Result{Success{}};
         }
 
         mParser.Next(&c);
@@ -392,11 +392,11 @@ Result JsonReadStream<ParserType>::beginField(bool& gotField, std::string& name)
     // LogFmt("FieldChar %c\n", c);
 
     if( c != '\"') {
-        return Result::makeSuccess();
+        return Result{Success{}};
     }
 
-	Result r = readString(name);
-	if(r.peekFailed()) {
+	Result<Success> r = readString(name);
+	if(!r) {
 		return r;
 	}
 
@@ -417,11 +417,11 @@ Result JsonReadStream<ParserType>::beginField(bool& gotField, std::string& name)
 	// LogFmt("Field! %s\n", name.c_str());
 
     stackFrame.mInField = true;
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::endField()
+Result<Success> JsonReadStream<ParserType>::endField()
 {
     ASSERT(mStack.size() > 0);
     StackFrame& stackFrame = mStack.top();
@@ -439,30 +439,30 @@ Result JsonReadStream<ParserType>::endField()
 
     if(c == ',' )
     {
-        return Result::makeSuccess();
+        return Result{Success{}};
 
     }
 
     if(c == '}')
     {
-        return Result::makeSuccess();
+        return Result{Success{}};
     }
 
     return makeError(formatString("Expected ',' or '}', not %c", c));
 }
 template<typename ParserType>
-Result JsonReadStream<ParserType>::readBoolean(bool& boolean)
+Result<Success> JsonReadStream<ParserType>::readBoolean(bool& boolean)
 {
     OmParseEatWhite(&mParser);
 
     if( OmParseMatch(&mParser, "true")) {
         boolean = true;
-        return Result::makeSuccess();
+        return Result{Success{}};
     }
 
     if(OmParseMatch(&mParser, "false")) {
         boolean = false;
-        return Result::makeSuccess();
+        return Result{Success{}};
     }
 
     return makeError("Expected 'true' or 'false'.");
@@ -470,16 +470,16 @@ Result JsonReadStream<ParserType>::readBoolean(bool& boolean)
 
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::makeEofError()
+Result<Success> JsonReadStream<ParserType>::makeEofError()
 {
 	return makeError("Unexpected end of file.");
 }
 
 template<typename ParserType>
-Result JsonReadStream<ParserType>::makeError(CStr message)
+Result<Success> JsonReadStream<ParserType>::makeError(CStr message)
 {
 	return
-        Result::makeFailureWithString(
+        Result<Success>::makeFailureWithString(
             formatString(
                 "Error: %s\n\tFile:%s\n\tLine:%d\n\tColumn:%d\n",
                 message.c_str(),
@@ -489,7 +489,7 @@ Result JsonReadStream<ParserType>::makeError(CStr message)
 }
 
 template< typename ParserType >
-Result JsonReadStream< ParserType >::parseUnicodeSequence( CharType* pRes )
+Result<Success> JsonReadStream< ParserType >::parseUnicodeSequence( CharType* pRes )
 {
     CharType value = 0;
     
@@ -528,5 +528,5 @@ Result JsonReadStream< ParserType >::parseUnicodeSequence( CharType* pRes )
     
     *pRes = value;
     
-    return Result::makeSuccess();
+    return Result{Success{}};
 }

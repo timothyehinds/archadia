@@ -50,6 +50,13 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "filesystem": "cpp",
+        "chrono": "cpp",
+        "codecvt": "cpp",
+        "ctime": "cpp",
+        "map": "cpp",
+        "ratio": "cpp"
+    },
+    "editor.cursorBlinking": "solid"
 }

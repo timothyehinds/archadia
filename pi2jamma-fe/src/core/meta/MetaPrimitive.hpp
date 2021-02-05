@@ -31,11 +31,11 @@ public:
 		: MetaPrimitiveBase(name,typeid(T)) {
 		}
 
-	virtual Result load(void* pItem, ObjectReadStream& readStream) const override {
+	virtual Result<Success> load(void* pItem, ObjectReadStream& readStream) const override {
 		return Serializer<T>::load(*static_cast<T*>(pItem), readStream);
 	}
 
-	virtual Result save(const void* pItem, ObjectWriteStream& writeStream) const override {
+	virtual Result<Success> save(const void* pItem, ObjectWriteStream& writeStream) const override {
 		return Serializer<T>::save(*static_cast<const T*>(pItem), writeStream);
 	}
 

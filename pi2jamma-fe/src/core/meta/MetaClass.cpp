@@ -30,10 +30,10 @@ MetaClassProperty::~MetaClassProperty()
 }
 
 
-Result MetaClassBase::load(void* object, ObjectReadStream& readStream) const
+Result<Success> MetaClassBase::load(void* object, ObjectReadStream& readStream) const
 {
-	Result r = readStream.beginObject();
-	if(r.peekFailed()) {
+	Result<Success> r = readStream.beginObject();
+	if(!r) {
 		return r;
 	}
 
@@ -43,7 +43,7 @@ Result MetaClassBase::load(void* object, ObjectReadStream& readStream) const
 		bool gotField = true;
 
 		r = readStream.beginField(gotField, name);
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 		
@@ -62,12 +62,12 @@ Result MetaClassBase::load(void* object, ObjectReadStream& readStream) const
 		}
 
 		r = pProp->load(object, readStream);
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 
 		r = readStream.endField();
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 	}
@@ -75,10 +75,10 @@ Result MetaClassBase::load(void* object, ObjectReadStream& readStream) const
 	return readStream.endObject();
 }
 
-Result MetaClassBase::save(const void* pVoidObject, ObjectWriteStream& writeStream) const
+Result<Success> MetaClassBase::save(const void* pVoidObject, ObjectWriteStream& writeStream) const
 {
-	Result r = writeStream.beginObject();
-	if(r.peekFailed()) {
+	Result<Success> r = writeStream.beginObject();
+	if(!r) {
 		return r;
 	}
 
@@ -88,28 +88,28 @@ Result MetaClassBase::save(const void* pVoidObject, ObjectWriteStream& writeStre
 	for(auto&& property : mPropertiesInDeclarationOrder) {
 
 		r = writeStream.beginField(property.getName());
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 
 		r = property.save(pVoidObject, writeStream);
 
-		if( r.peekFailed()) {
+		if( !r) {
 			return r;
 		}
 
 		r = writeStream.endField();
-		if(r.peekFailed()) {
+		if(!r) {
 			return r;
 		}
 	}
 
 	r = writeStream.endObject();
-	if(r.peekFailed()) {
+	if(!r) {
 		return r;
 	}
 	
-	return Result::makeSuccess();
+	return Result{Success{}};
 }
 
 

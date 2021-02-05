@@ -22,21 +22,20 @@ public:
 
 	static Application& get();
 
-	Result run(int argc, const char* argv[]);
+	Result<Success> run(int argc, const char* argv[]);
 	void quit();
 
-	virtual Result initialize(int argc, const char* argv[]) = 0;
+	virtual Result<Success> initialize(int argc, const char* argv[]) = 0;
 	virtual void render(RenderContext& renderContext) = 0;
 	virtual void keyDownEvent(const KeyDownEvent& keyDownEvent) = 0;
 
-	Result loadSurface(ref<Surface>& surface, CStr fileName);
+	Result<ref<Surface>> loadSurface(CStr fileName);
 	
-	Result loadFont(
-		ref<Font>& refFont,
+	Result<ref<Font>> loadFont(
 		UnitType sizePx,
 		CStr fileName);
 	
-	Result renderText(
+	Result<Success> renderText(
 		ref<Surface>& refSurface,
 		const ref<Font>& refFont,
 		const Color& color,
@@ -46,7 +45,7 @@ public:
 
 private:
 
-	Result renderLoop();
+	Result<Success> renderLoop();
 	void dispatchEvent(const SDL_Event& sdlEvent);		
 
 	bool mQuit;
