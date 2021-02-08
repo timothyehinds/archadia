@@ -89,12 +89,12 @@ OmBool OmParseTokenWithCharDelimiters(
             break;
         }
         
-        pWorkArea->PushBack( c );
+        pWorkArea->push_back( c );
         
         pParser->Next();
     }
     
-    if ( pWorkArea->GetCount() > 0 )
+    if ( pWorkArea->size() > 0 )
     {
         (*pString) = pParser->StringFromWorkArea();
         return OmTrue;
@@ -150,7 +150,7 @@ OmBool OmParseTokenWithCharRule(
 
     while ( rule( c ) )
     {
-        pWorkArea->PushBack( c );
+        pWorkArea->push_back( c );
         
         if ( ! pParser->Adv( & c ) )
         {
@@ -220,7 +220,7 @@ OmBool OmParseMatchDelmitedList(
             return OmTrue;
         }
         
-        pWorkArea->PushBack( c );
+        pWorkArea->push_back( c );
         
         p.Next();
     }
@@ -242,7 +242,7 @@ inline void OmParseSplit(
         
         if ( eof || ( delimiter == c ) )
         {
-            pVector->PushBack( *pWorkArea );
+            pVector->push_back( *pWorkArea );
             
             if ( eof )
             {
@@ -253,7 +253,7 @@ inline void OmParseSplit(
         }
         else
         {
-            pWorkArea->PushBack( c );
+            pWorkArea->push_back( c );
         }
         
         pParser->Next();
@@ -282,7 +282,7 @@ inline void OmParseToDelimiterOrEof(
             return;
         }
         
-        pVector->PushBack( c );
+        pVector->push_back( c );
         
         pParser->Next();
     }
@@ -305,7 +305,7 @@ inline OmBool OmParseTokenWithDelimeter(
     {
         if ( escape )
         {
-            pVector->PushBack( c );
+            pVector->push_back( c );
             escape = OmFalse;
         }
         else if ( escapeChar == c )
@@ -320,7 +320,7 @@ inline OmBool OmParseTokenWithDelimeter(
         }
         else
         {
-            pVector->PushBack( c );
+            pVector->push_back( c );
         }
         
         parser.Next();
@@ -348,7 +348,7 @@ inline OmBool OmParseMatchCVar( PARSER_T* pParser, OmString* pString )
         ( ( c >= 'A' ) && ( c <= 'Z' ) ) ||
         ( ( ! first ) && ( c >= '0' ) && ( c <= '9' ) ) )
     {
-        pWorkArea->PushBack( c );
+        pWorkArea->push_back( c );
         
         parser.Next( );
         
@@ -461,7 +461,7 @@ inline OmBool OmParseMatchCStyleComment( PARSER_T* pParser, OmString* pComment )
     {
         while( ! OmParseMatch( & parser, OmSl( "*/" ) ) )
         {
-            pWorkArea->PushBack( parser.Peek() );
+            pWorkArea->push_back( parser.Peek() );
             
             if ( parser.Eof() )
             {
@@ -504,7 +504,7 @@ inline OmBool OmParseMatchCppStyleComment( PARSER_T* pParser, OmString * pCommen
             break;
         }
         
-        pWorkArea->PushBack( c );
+        pWorkArea->push_back( c );
         
         parser.Next();
     }
@@ -586,7 +586,7 @@ inline OmBool OmParseMatchQuotedString( PARSER_T* pParser, OmString* pString )
                 }
             }
 
-            pWorkArea->PushBack( c );
+            pWorkArea->push_back( c );
         }
     }
     

@@ -56,7 +56,8 @@
         "codecvt": "cpp",
         "ctime": "cpp",
         "map": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "variant": "cpp"
     },
     "editor.cursorBlinking": "solid"
 }

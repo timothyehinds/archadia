@@ -15,7 +15,7 @@ ref<BitmapFont> BitmapFont::fromFont(
 	GlyphArray glyphArray;
 	UnitType glyphHeight(0);
 
-	for(size_t i = 0; i < 256; i ++ )
+	for(size_t i = 1; i < 256; i ++ )
 	{
 		c[0] = static_cast<char>(i);
 

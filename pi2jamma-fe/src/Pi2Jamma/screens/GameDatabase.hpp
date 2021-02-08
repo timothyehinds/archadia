@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Pi2Jamma/retroarch/RetroarchConfigFile.hpp"
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -19,10 +21,15 @@ class GameCore
 {
 public:
     GameCore(std::filesystem::path);
+    const char* getDisplayName() const;
+    const char* getRomsFolder() const;
+//private:
 
     std::filesystem::path m_path;
+    std::string m_romsFolder;
     std::vector<std::unique_ptr<Game>> m_games;
-    std::map<std::string, std::string> m_infoMap;
+
+    RetroarchConfigFile m_infoFile;
 };
 
 class Games

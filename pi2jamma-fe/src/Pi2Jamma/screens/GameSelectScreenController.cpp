@@ -14,12 +14,12 @@ CStr GameSelectScreenController::GameSelectScreenModel::getTitle()
 
 size_t GameSelectScreenController::GameSelectScreenModel::getNumItems()
 {
-	return 1;
+	return m_controller.m_gameDatabase.m_cores.size();
 }
 
 CStr GameSelectScreenController::GameSelectScreenModel::getItemText(const size_t i)
 {
-	return "Pac Man";
+	return m_controller.m_gameDatabase.m_cores[i]->getRomsFolder();
 }
 
 ref<ui::Surface> GameSelectScreenController::GameSelectScreenModel::getItemSurface(const size_t i)
@@ -29,6 +29,7 @@ ref<ui::Surface> GameSelectScreenController::GameSelectScreenModel::getItemSurfa
 
 void GameSelectScreenController::GameSelectScreenModel::onItemSelected(const size_t i)
 {
+	
 
 }
 

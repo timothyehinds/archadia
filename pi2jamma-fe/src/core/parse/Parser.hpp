@@ -12,8 +12,7 @@ class OmParser
         using PositionType = size_t; 
         using CharType = typename StreamType::CharType;
         using WorkAreaType = std::vector< CharType >;
-    
-        //OmParser( );
+
         OmParser(
             typename Arg< StreamType >::Type stream,
             std::vector< CharType >& wWorkArea,
@@ -177,13 +176,13 @@ const std::string OmParser< StreamType>::GetErrorHint( void )
             break;
         }
         
-        err.PushBack( c );
+        err.push_back( c );
         
         Next();
         
     }
     
-    return OmSl( "Before:" ) + std::string( err.data(), err.GetCount() );
+    return OmSl( "Before:" ) + std::string( err.data(), err.size() );
 }
 
 template< typename StreamType>

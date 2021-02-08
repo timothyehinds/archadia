@@ -141,11 +141,11 @@ inline Result<T>::Result(const T& t)
 {
 }
 
-
 template<typename T>
 inline Result<T>::Result(InfoFunction&& infoFunction)
 	: m_variant(std::move(infoFunction))
 {
+	PRINTFMT("Result error: %s\n", getMessage());
 }
 
 template<typename T>
