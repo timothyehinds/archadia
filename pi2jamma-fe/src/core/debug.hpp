@@ -8,7 +8,7 @@
 #define PRINTFMT(fmt, ...) \
 	fprintf(stderr, fmt, __VA_ARGS__)
 
-#define STOP() { PRINT("STOP()!\n"); __asm__("int3"); }
+#define STOP() { PRINT("STOP()!\n"); while(1) {} }
 
 #define ASSERTFMT(x, message, ...) \
 	{ \

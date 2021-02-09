@@ -2,10 +2,18 @@
 
 #include "core/meta/MetaPrimitive.hpp"
 
-Meta* Meta::spSingleton = nullptr;
+Meta* Meta::spSingleton{nullptr};
 
-void Meta::initialize() {
+void Meta::initialize()
+{
+	ASSERT(!spSingleton);
 	new Meta();
+}
+
+void Meta::terminate()
+{	
+	delete spSingleton;
+	spSingleton = nullptr;
 }
 
 Meta::Meta()

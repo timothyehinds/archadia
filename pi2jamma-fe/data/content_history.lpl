@@ -8,6 +8,14 @@
   "sort_mode": 2,
   "items": [
     {
+      "path": "/home/pi/archadia/roms/nes/Legend of Zelda, The (U) (PRG1) [!].nes",
+      "label": "",
+      "core_path": "/home/pi/.config/retroarch/cores/quicknes_libretro.so",
+      "core_name": "Nintendo - NES / Famicom (QuickNES)",
+      "crc32": "",
+      "db_name": ""
+    },
+    {
       "path": "/home/x/arcade/archadia/roms/nes/Legend of Zelda, The (U) (PRG1) [!].nes",
       "label": "",
       "core_path": "/home/x/.config/retroarch/cores/fceumm_libretro.so",

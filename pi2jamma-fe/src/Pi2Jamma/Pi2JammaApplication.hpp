@@ -15,6 +15,7 @@ class Pi2JammaApplication : public ui::Application
 {
 public:
 	Pi2JammaApplication();
+	~Pi2JammaApplication();
 
 private:
 	virtual Result<Success> initialize(int argc, const char* argv[]) override;

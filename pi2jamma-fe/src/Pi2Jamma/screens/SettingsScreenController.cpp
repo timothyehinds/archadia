@@ -52,7 +52,7 @@ void SettingsScreenController::SettingsScreenModel::onItemSelected(const size_t 
     else if (1 == i)
     {
         std::string output;
-        Result<Success> r{System::exec("retroarch -c ./data/retroarch.cfg", output)};
+        Result<Success> r{System::exec("retroarch -c ./data/retroarch.cfg &", output)};
     }
 }
 

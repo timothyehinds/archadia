@@ -27,7 +27,7 @@ public:
 		return mName;
 	}
 
-	virtual uint64_t getValue() const {
+	virtual const uint64_t& getValue() const {
 		return mValue;
 	}
 

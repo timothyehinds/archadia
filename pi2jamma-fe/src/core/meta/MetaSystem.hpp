@@ -15,6 +15,7 @@ class Meta
 public:
 
 	static void initialize();
+	static void terminate();
 
 	static Meta& get();
 

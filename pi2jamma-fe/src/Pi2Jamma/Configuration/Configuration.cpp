@@ -13,7 +13,6 @@ void Configuration::initialize()
 	META_CLASS_PROPERTY(Configuration, Ui);
 }
 
-
 Configuration::Configuration()
 	: mSaveConfigOnExit(true)
 {}

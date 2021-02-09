@@ -62,5 +62,10 @@ void Games::load(const char* pCoreFolderPath, const char* pRomsFolderPath)
             m_cores.push_back(std::move(uptGameCore));            
         }
     }
+
+    if (errorCode)
+    {
+        PRINT(errorCode.message().c_str());
+    }
 }
 

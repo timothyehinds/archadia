@@ -20,6 +20,11 @@ Pi2JammaApplication::Pi2JammaApplication()
 {
 }
 
+Pi2JammaApplciation::~Pi2JammaApplication()
+{
+	Meta::terminate();
+}
+
 Result<Success> Pi2JammaApplication::initialize(int argc, const char* argv[])
 {
 	Meta::initialize();

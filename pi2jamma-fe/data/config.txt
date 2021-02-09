@@ -15,6 +15,6 @@
 	{
 		"ScreenOrientation" : "Portrait",
 		"LandscapeTheme" : "burgertime",
-		"PortraitTheme" : "burgertime"
-	}
+		"PortraitTheme" : "burgertime",
+	},
 }

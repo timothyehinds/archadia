@@ -15,4 +15,5 @@ public:
 	PROPERTY(bool, SaveConfigOnExit);
 	PROPERTY(KeyConfiguration, Keys);
 	PROPERTY(UiConfiguration, Ui);
+
 };
